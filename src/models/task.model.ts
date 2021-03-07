@@ -12,7 +12,7 @@ interface ITaskInterface extends IProps {
 }
 
 export default class TaskModel {
-  private _id: string;
+  private readonly _id: string;
   private _listId: string;
   private _description: string;
   private _completed: boolean;
@@ -29,7 +29,7 @@ export default class TaskModel {
   }
 
   set listId(value: string) {
-    this._listId = value !== "" ? value: null;
+    this._listId = value;
   }
 
   get listId(): string {
@@ -37,7 +37,7 @@ export default class TaskModel {
   }
 
   set description(value: string) {
-    this._description = value !== "" ? value: null;
+    this._description = value;
   }
 
   get description(): string {
@@ -45,7 +45,7 @@ export default class TaskModel {
   }
 
   set completed(value: boolean) {
-    this._completed = value ? value: null;
+    this._completed = value;
   }
 
   get completed(): boolean {

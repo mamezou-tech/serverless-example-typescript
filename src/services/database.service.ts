@@ -6,23 +6,23 @@ import { StatusCode } from "../enums/status-code.enum";
 import { ResponseMessage } from "../enums/response-message.enum";
 import IConfig from "../interfaces/config.interface";
 
-type PutItem = AWS.DynamoDB.DocumentClient.PutItemInput;
-type PutItemOutput = AWS.DynamoDB.DocumentClient.PutItemOutput;
+export type PutItem = AWS.DynamoDB.DocumentClient.PutItemInput;
+export type PutItemOutput = AWS.DynamoDB.DocumentClient.PutItemOutput;
 
-type BatchWrite = AWS.DynamoDB.DocumentClient.BatchWriteItemInput;
-type BatchWriteOutput = AWS.DynamoDB.DocumentClient.BatchWriteItemOutput;
+export type BatchWrite = AWS.DynamoDB.DocumentClient.BatchWriteItemInput;
+export type BatchWriteOutput = AWS.DynamoDB.DocumentClient.BatchWriteItemOutput;
 
-type UpdateItem = AWS.DynamoDB.DocumentClient.UpdateItemInput;
-type UpdateItemOutput = AWS.DynamoDB.DocumentClient.UpdateItemOutput;
+export type UpdateItem = AWS.DynamoDB.DocumentClient.UpdateItemInput;
+export type UpdateItemOutput = AWS.DynamoDB.DocumentClient.UpdateItemOutput;
 
-type QueryItem = AWS.DynamoDB.DocumentClient.QueryInput;
-type QueryItemOutput = AWS.DynamoDB.DocumentClient.QueryOutput;
+export type QueryItem = AWS.DynamoDB.DocumentClient.QueryInput;
+export type QueryItemOutput = AWS.DynamoDB.DocumentClient.QueryOutput;
 
-type GetItem = AWS.DynamoDB.DocumentClient.GetItemInput;
-type GetItemOutput = AWS.DynamoDB.DocumentClient.GetItemOutput;
+export type GetItem = AWS.DynamoDB.DocumentClient.GetItemInput;
+export type GetItemOutput = AWS.DynamoDB.DocumentClient.GetItemOutput;
 
-type DeleteItem = AWS.DynamoDB.DocumentClient.DeleteItemInput;
-type DeleteItemOutput = AWS.DynamoDB.DocumentClient.DeleteItemOutput;
+export type DeleteItem = AWS.DynamoDB.DocumentClient.DeleteItemInput;
+export type DeleteItemOutput = AWS.DynamoDB.DocumentClient.DeleteItemOutput;
 
 type Item = {[index: string]: string};
 
@@ -63,7 +63,7 @@ export default class DatabaseService {
     if (Object.keys(results).length) {
       return results;
     }
-    //console.error("item does not exist");
+    console.error("item does not exist");
     throw new ResponseModel({ id: key}, StatusCode.BAD_REQUEST, ResponseMessage.INVALID_REQUEST);
   };
 

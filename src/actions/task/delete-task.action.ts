@@ -2,73 +2,47 @@ import {
   APIGatewayProxyHandler,
   APIGatewayEvent,
   Context,
-  APIGatewayProxyResult
-} from 'aws-lambda';
-import 'source-map-support/register';
+  APIGatewayProxyResult,
+} from "aws-lambda";
+import "source-map-support/register";
 
-// Models
 import ResponseModel from "../../models/response.model";
+import DatabaseService, { DeleteItem } from "../../services/database.service";
+import { databaseTables, validateAgainstConstraints } from "../../utils/util";
+import requestConstraints from "../../constraints/task/delete.constraint.json";
 
-// Services
-import DatabaseService from "../../services/database.service";
-
-// utils
-import { validateAgainstConstraints } from "../../utils/util";
-
-// Define the request constraints
-import requestConstraints from '../../constraints/task/delete.constraint.json';
-
-
-export const deleteTask: APIGatewayProxyHandler = async (event: APIGatewayEvent, _context: Context): Promise<APIGatewayProxyResult> => {
-  // Initialize response variable
-  let response;
-
-  // Parse request parameters
-  const requestData = JSON.parse(event.body);
-
-  // Initialise database service
+export const deleteTask: APIGatewayProxyHandler = async (
+  event: APIGatewayEvent,
+  _context: Context
+): Promise<APIGatewayProxyResult> => {
+  const requestData = JSON.parse(event.body || "{}");
   const databaseService = new DatabaseService();
+  const { taskId, listId } = requestData;
+  const { tasksTable } = databaseTables();
 
-  // Destructure request data
-  const {taskId, listId} = requestData;
-
-  // Destructure process.env
-  const {TASKS_TABLE} = process.env;
-
-  // Validate against constraints
-  return validateAgainstConstraints(requestData, requestConstraints)
-    .then(() => {
-      // Get item from the DynamoDB table
-      // if it exists
-      return databaseService.getItem({
-        key: taskId,
-        hash: 'listId',
-        hashValue: listId,
-        tableName: TASKS_TABLE
-      });
-    })
-    .then(() => {
-      // Initialise DynamoDB DELETE parameters
-      const params = {
-        TableName: TASKS_TABLE,
-        Key: {
-          "id": taskId,
-          "listId": listId
-        },
-      };
-      // Delete task from db
-      return databaseService.delete(params);
-    })
-    .then(() => {
-      // Set Success Response
-      response = new ResponseModel({}, 200, 'Task successfully deleted');
-    })
-    .catch((error) => {
-      // Set Error Response
-      response = (error instanceof ResponseModel) ? error : new ResponseModel({}, 500, 'Task could not be deleted');
-    })
-    .then(() => {
-      // Return API Response
-      return response.generate();
+  try {
+    await validateAgainstConstraints(requestData, requestConstraints);
+    await databaseService.getItem({
+      key: taskId,
+      hash: "listId",
+      hashValue: listId,
+      tableName: tasksTable,
     });
+    const params: DeleteItem = {
+      TableName: tasksTable,
+      Key: {
+        id: taskId,
+        listId: listId,
+      },
+    };
+    await databaseService.delete(params);
+    const response = new ResponseModel({}, 200, "Task successfully deleted");
+    return response.generate();
+  } catch (error) {
+    const response =
+      error instanceof ResponseModel
+        ? error
+        : new ResponseModel({}, 500, "Task could not be deleted");
+    return response.generate();
+  }
 };

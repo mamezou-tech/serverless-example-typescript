@@ -1,6 +1,6 @@
 import { Status } from "../enums/status.enum";
 
-type ResponseHeader = { [header: string]: string | number | boolean }
+type ResponseHeader = { [header: string]: string | number | boolean };
 
 interface IResponseBody {
   data: any;
@@ -40,7 +40,7 @@ export default class ResponseModel {
 
   setBodyVariable = (variable: string, value: string): void => {
     this.body[variable] = value;
-  }
+  };
 
   get message(): string {
     return this.body.message;
@@ -56,5 +56,5 @@ export default class ResponseModel {
       headers: RESPONSE_HEADERS,
       body: JSON.stringify(this.body),
     };
-  }
+  };
 }

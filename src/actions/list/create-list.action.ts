@@ -1,47 +1,45 @@
-import {
-  APIGatewayProxyHandler,
-  APIGatewayEvent,
-  Context,
-  APIGatewayProxyResult
-} from "aws-lambda";
+import { Context } from "aws-lambda";
 import "source-map-support/register";
 
 import ListModel from "../../models/list.model";
 import ResponseModel from "../../models/response.model";
 
-import DatabaseService from "../../services/database.service";
-import { validateAgainstConstraints } from "../../utils/util";
+import DatabaseService, { PutItem } from "../../services/database.service";
+import { databaseTables, validateAgainstConstraints } from "../../utils/util";
 
 import requestConstraints from "../../constraints/list/create.constraint.json";
+import { PostRequestHandler, wrapPost } from "../../utils/lambda-handler";
 
-export const createList: APIGatewayProxyHandler = async (event: APIGatewayEvent, _context: Context): Promise<APIGatewayProxyResult> => {
-  let response: ResponseModel;
-
-  const requestData = JSON.parse(event.body);
-  return validateAgainstConstraints(requestData, requestConstraints)
-    .then(async () => {
-      const databaseService = new DatabaseService();
-      const listModel = new ListModel(requestData);
-      const data = listModel.toEntityMappings();
-      const params = {
-        TableName: process.env.LIST_TABLE,
-        Item: {
-          id: data.id,
-          name: data.name,
-          createdAt: data.timestamp,
-          updatedAt: data.timestamp,
-        }
-      };
-      await databaseService.create(params);
-      return data.id;
-    })
-    .then((listId) => {
-      response = new ResponseModel({listId}, 200, 'TO-do list successfully created');
-    })
-    .catch((error) => {
-      response = (error instanceof ResponseModel) ? error : new ResponseModel({}, 500, "To-do list cannot be created");
-    })
-    .then(() => {
-      return response.generate();
-    });
+const createList: PostRequestHandler = async (
+  body: string,
+  _context: Context
+): Promise<ResponseModel> => {
+  try {
+    await validateAgainstConstraints(body as any, requestConstraints);
+    const databaseService = new DatabaseService();
+    const listModel = new ListModel(body as any);
+    const data = listModel.toEntityMappings();
+    const params: PutItem = {
+      TableName: databaseTables().listTable,
+      Item: {
+        id: data.id,
+        name: data.name,
+        createdAt: data.timestamp,
+        updatedAt: data.timestamp,
+      },
+    };
+    await databaseService.create(params);
+    return new ResponseModel(
+      { listId: data.id },
+      200,
+      "TO-do list successfully created"
+    );
+  } catch (error) {
+    return error instanceof ResponseModel
+      ? error
+      : new ResponseModel({}, 500, "To-do list cannot be created");
+  }
 };
+
+const wrappedCreateList = wrapPost(createList);
+export { wrappedCreateList as createList };

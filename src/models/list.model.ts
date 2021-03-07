@@ -19,7 +19,7 @@ export default class ListModel {
   }
 
   set id(value: string) {
-    this._id = value !== "" ? value: null;
+    this._id = value;
   }
 
   get id(): string {

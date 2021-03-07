@@ -2,82 +2,68 @@ import {
   APIGatewayProxyHandler,
   APIGatewayEvent,
   Context,
-  APIGatewayProxyResult
-} from 'aws-lambda';
-import 'source-map-support/register';
+  APIGatewayProxyResult,
+} from "aws-lambda";
+import "source-map-support/register";
 
-// Models
 import ResponseModel from "../../models/response.model";
+import DatabaseService, { QueryItem } from "../../services/database.service";
+import { databaseTables, validateAgainstConstraints } from "../../utils/util";
+import requestConstraints from "../../constraints/list/get.constraint.json";
 
-// Services
-import DatabaseService from "../../services/database.service";
+export const getList: APIGatewayProxyHandler = async (
+  event: APIGatewayEvent,
+  _context: Context
+): Promise<APIGatewayProxyResult> => {
 
-// utils
-import { validateAgainstConstraints } from "../../utils/util";
-
-// Define the request constraints
-import requestConstraints from '../../constraints/list/get.constraint.json';
-
-export const getList: APIGatewayProxyHandler = async (event: APIGatewayEvent, _context: Context): Promise<APIGatewayProxyResult> => {
-  // Initialize response variable
-  let response;
-
-  // Parse request parameters
-  const requestData = JSON.parse(event.body);
-
-  // Initialise database service
+  const requestData = JSON.parse(event.body ?? "{}");
   const databaseService = new DatabaseService();
+  const { listId } = requestData;
+  const { listTable, tasksTable } = databaseTables();
 
-  // Destructure request data
-  const {listId} = requestData;
+  try {
+    await validateAgainstConstraints(requestData, requestConstraints);
+    const data = await databaseService.getItem({
+      key: listId,
+      tableName: listTable,
+    });
 
-  // Destructure process.env
-  const {LIST_TABLE, TASKS_TABLE} = process.env;
+    const params: QueryItem = {
+      TableName: tasksTable,
+      IndexName: "list_index",
+      KeyConditionExpression: "listId = :listIdVal",
+      ExpressionAttributeValues: {
+        ":listIdVal": listId,
+      },
+    };
 
-  // Validate against constraints
-  return validateAgainstConstraints(requestData, requestConstraints)
-    .then(async () => {
-
-      // Get item from the DynamoDB table
-      return await databaseService.getItem({key: listId, tableName: LIST_TABLE});
-    })
-    .then(async (data) => {
-      // Initialise DynamoDB QUERY parameters
-      const params = {
-        TableName: TASKS_TABLE,
-        IndexName: 'list_index',
-        KeyConditionExpression: 'listId = :listIdVal',
-        ExpressionAttributeValues: {
-          ':listIdVal': listId
-        }
+    const results = await databaseService.query(params);
+    const tasks = results?.Items?.map((task) => {
+      return {
+        id: task.id,
+        description: task.description,
+        completed: task.completed,
+        createdAt: task.createdAt,
+        updatedAt: task.updatedAt,
       };
+    });
 
-      // Query table for tasks with the listId
-      const results = await databaseService.query(params);
-      const tasks = results?.Items?.map((task) => {
-        return {
-          id: task.id,
-          description: task.description,
-          completed: task.completed,
-          createdAt: task.createdAt,
-          updatedAt: task.updatedAt,
-        };
-      });
-
-      // Set Success Response with data
-      response = new ResponseModel({
+    // Set Success Response with data
+    const response = new ResponseModel(
+      {
         ...data.Item,
         taskCount: tasks?.length,
         tasks: tasks,
-      }, 200, 'To-do list successfully retrieved');
-
-    })
-    .catch((error) => {
-      // Set Error Response
-      response = (error instanceof ResponseModel) ? error : new ResponseModel({}, 500, 'To-do list not found');
-    })
-    .then(() => {
-      // Return API Response
-      return response.generate();
-    });
+      },
+      200,
+      "To-do list successfully retrieved"
+    );
+    return response.generate();
+  } catch (error) {
+    const response =
+      error instanceof ResponseModel
+        ? error
+        : new ResponseModel({}, 500, "To-do list not found");
+    return response.generate();
+  }
 };
