@@ -1,4 +1,4 @@
-import {v4 as UUID} from "uuid";
+import { v4 as UUID } from "uuid";
 
 interface IProps {
   id?: string;
@@ -7,7 +7,7 @@ interface IProps {
   completed: boolean;
 }
 
-interface ITaskInterface extends IProps {
+export interface ITaskInterface extends IProps {
   timestamp: number;
 }
 
@@ -17,7 +17,12 @@ export default class TaskModel {
   private _description: string;
   private _completed: boolean;
 
-  constructor({id = UUID(), listId, description = "", completed = false}: IProps) {
+  constructor({
+    id = UUID(),
+    listId,
+    description = "",
+    completed = false,
+  }: IProps) {
     this._id = id;
     this._listId = listId;
     this._description = description;

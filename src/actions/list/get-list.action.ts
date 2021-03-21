@@ -1,28 +1,20 @@
-import {
-  APIGatewayProxyHandler,
-  APIGatewayEvent,
-  Context,
-  APIGatewayProxyResult,
-} from "aws-lambda";
 import "source-map-support/register";
 
 import ResponseModel from "../../models/response.model";
 import DatabaseService, { QueryItem } from "../../services/database.service";
-import { databaseTables, validateAgainstConstraints } from "../../utils/util";
+import { databaseTables, validateRequest } from "../../utils/util";
 import requestConstraints from "../../constraints/list/get.constraint.json";
+import { wrapAsJsonRequest } from "../../utils/lambda-handler";
 
-export const getList: APIGatewayProxyHandler = async (
-  event: APIGatewayEvent,
-  _context: Context
-): Promise<APIGatewayProxyResult> => {
-
-  const requestData = JSON.parse(event.body ?? "{}");
+const getListHandler = async (body: {
+  listId: string;
+}): Promise<ResponseModel> => {
   const databaseService = new DatabaseService();
-  const { listId } = requestData;
   const { listTable, tasksTable } = databaseTables();
 
   try {
-    await validateAgainstConstraints(requestData, requestConstraints);
+    await validateRequest(body, requestConstraints);
+    const { listId } = body;
     const data = await databaseService.getItem({
       key: listId,
       tableName: listTable,
@@ -48,8 +40,7 @@ export const getList: APIGatewayProxyHandler = async (
       };
     });
 
-    // Set Success Response with data
-    const response = new ResponseModel(
+    return new ResponseModel(
       {
         ...data.Item,
         taskCount: tasks?.length,
@@ -58,12 +49,11 @@ export const getList: APIGatewayProxyHandler = async (
       200,
       "To-do list successfully retrieved"
     );
-    return response.generate();
   } catch (error) {
-    const response =
-      error instanceof ResponseModel
-        ? error
-        : new ResponseModel({}, 500, "To-do list not found");
-    return response.generate();
+    return error instanceof ResponseModel
+      ? error
+      : new ResponseModel({}, 500, "To-do list not found");
   }
 };
+
+export const getList = wrapAsJsonRequest(getListHandler);

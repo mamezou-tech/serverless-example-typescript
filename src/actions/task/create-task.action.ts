@@ -1,34 +1,27 @@
-import {
-  APIGatewayProxyHandler,
-  APIGatewayEvent,
-  Context,
-  APIGatewayProxyResult,
-} from "aws-lambda";
 import "source-map-support/register";
 
-import TaskModel from "../../models/task.model";
+import TaskModel, { ITaskInterface } from "../../models/task.model";
 import ResponseModel from "../../models/response.model";
 import DatabaseService, { PutItem } from "../../services/database.service";
-import { databaseTables, validateAgainstConstraints } from "../../utils/util";
+import { databaseTables, validateRequest } from "../../utils/util";
 import requestConstraints from "../../constraints/task/create.constraint.json";
+import { wrapAsJsonRequest } from "../../utils/lambda-handler";
 
-export const createTask: APIGatewayProxyHandler = async (
-  event: APIGatewayEvent,
-  _context: Context
-): Promise<APIGatewayProxyResult> => {
-  const requestData = JSON.parse(event.body ?? "{}");
+const createTaskHandler = async (
+  body: ITaskInterface
+): Promise<ResponseModel> => {
   const databaseService = new DatabaseService();
   const { listTable, tasksTable } = databaseTables();
 
   try {
     await Promise.all([
-      validateAgainstConstraints(requestData, requestConstraints),
+      validateRequest(body, requestConstraints),
       databaseService.getItem({
-        key: requestData.listId,
+        key: body.listId,
         tableName: listTable,
       }),
     ]);
-    const taskModel = new TaskModel(requestData);
+    const taskModel = new TaskModel(body);
     const data = taskModel.toEntityMapping();
 
     const params: PutItem = {
@@ -43,17 +36,16 @@ export const createTask: APIGatewayProxyHandler = async (
       },
     };
     await databaseService.create(params);
-    const response = new ResponseModel(
+    return new ResponseModel(
       { taskId: data.id },
       200,
       "Task successfully added"
     );
-    return response.generate();
   } catch (error) {
-    const response =
-      error instanceof ResponseModel
-        ? error
-        : new ResponseModel({}, 500, "Task could not be added");
-    return response.generate();
+    return error instanceof ResponseModel
+      ? error
+      : new ResponseModel({}, 500, "Task could not be added");
   }
 };
+
+export const createTask = wrapAsJsonRequest(createTaskHandler);

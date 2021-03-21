@@ -17,23 +17,23 @@ interface IResponse {
 const STATUS_MESSAGES = {
   200: Status.SUCCESS,
   400: Status.BAD_REQUEST,
-  500: Status.ERROR
+  500: Status.ERROR,
 };
 
 const RESPONSE_HEADERS: ResponseHeader = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Credentials": true
+  "Access-Control-Allow-Credentials": true,
 };
 
 export default class ResponseModel {
   private readonly body: IResponseBody;
 
-  constructor(data = {}, readonly code = 402, message = '') {
+  constructor(data = {}, readonly code = 402, message = "") {
     this.body = {
       data,
       message,
-      status: STATUS_MESSAGES[code]
+      status: STATUS_MESSAGES[code],
     };
     this.code = code;
   }

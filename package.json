@@ -9,7 +9,9 @@
     "undeploy:prod": "sls remove --stage prod",
     "start:offline": "sls offline start",
     "start:offline:debug": "SLS_DEBUG=1 sls offline start",
-    "dynamodb:install": "sls dynamodb install"
+    "dynamodb:install": "sls dynamodb install",
+    "lint": "eslint --fix",
+    "prettier": "prettier -w src"
   },
   "dependencies": {
     "aws-sdk": "^2.848.0",
@@ -21,13 +23,21 @@
     "@types/node": "^10.12.18",
     "@types/serverless": "^1.78.20",
     "@types/uuid": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "^4.17.0",
+    "@typescript-eslint/parser": "^4.17.0",
+    "eslint": "^7.22.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
     "npm-run-all": "^4.1.5",
-    "prettier": "2.2.1",
+    "prettier": "^2.2.1",
     "serverless": "^2.28.0",
+    "serverless-api-gateway-throttling": "^1.1.0",
     "serverless-bundle": "^3.2.1",
     "serverless-dotenv-plugin": "^3.7.2",
     "serverless-dynamodb-local": "^0.2.39",
     "serverless-offline": "^6.8.0",
+    "serverless-plugin-aws-alerts": "^1.7.1",
+    "serverless-plugin-subscription-filter": "^1.0.7",
     "typescript": "^4.1.5"
   },
   "author": "noboru-kudo",

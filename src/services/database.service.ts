@@ -24,14 +24,14 @@ export type GetItemOutput = AWS.DynamoDB.DocumentClient.GetItemOutput;
 export type DeleteItem = AWS.DynamoDB.DocumentClient.DeleteItemInput;
 export type DeleteItemOutput = AWS.DynamoDB.DocumentClient.DeleteItemOutput;
 
-type Item = {[index: string]: string};
+type Item = { [index: string]: string };
 
 const {
   STAGE,
   DYNAMODB_LOCAL_STAGE,
   DYNAMODB_LOCAL_ACCESS_KEY_ID,
   DYNAMODB_LOCAL_SECRET_ACCESS_KEY,
-  DYNAMODB_LOCAL_ENDPOINT
+  DYNAMODB_LOCAL_ENDPOINT,
 } = process.env;
 const config: IConfig = {
   region: "ap-northeast-1",
@@ -48,8 +48,12 @@ AWS.config.update(config);
 const documentClient = new AWS.DynamoDB.DocumentClient();
 
 export default class DatabaseService {
-
-  getItem = async({key, hash, hashValue, tableName}: Item): Promise<GetItemOutput> => {
+  getItem = async ({
+    key,
+    hash,
+    hashValue,
+    tableName,
+  }: Item): Promise<GetItemOutput> => {
     const params = {
       TableName: tableName,
       Key: {
@@ -64,12 +68,15 @@ export default class DatabaseService {
       return results;
     }
     console.error("item does not exist");
-    throw new ResponseModel({ id: key}, StatusCode.BAD_REQUEST, ResponseMessage.INVALID_REQUEST);
+    throw new ResponseModel(
+      { id: key },
+      StatusCode.NOT_FOUND,
+      ResponseMessage.INVALID_REQUEST
+    );
   };
 
-  create = async(params: PutItem): Promise<PutItemOutput> => {
+  create = async (params: PutItem): Promise<PutItemOutput> => {
     try {
-      //console.log("create-param", params)
       return await documentClient.put(params).promise();
     } catch (error) {
       console.error("create-error", error);
@@ -81,7 +88,7 @@ export default class DatabaseService {
     try {
       return await documentClient.batchWrite(params).promise();
     } catch (error) {
-      throw new ResponseModel({}, 500 , `batch-write-error: ${error}`);
+      throw new ResponseModel({}, 500, `batch-write-error: ${error}`);
     }
   };
 

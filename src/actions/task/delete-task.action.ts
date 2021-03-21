@@ -1,27 +1,21 @@
-import {
-  APIGatewayProxyHandler,
-  APIGatewayEvent,
-  Context,
-  APIGatewayProxyResult,
-} from "aws-lambda";
 import "source-map-support/register";
 
 import ResponseModel from "../../models/response.model";
 import DatabaseService, { DeleteItem } from "../../services/database.service";
-import { databaseTables, validateAgainstConstraints } from "../../utils/util";
+import { databaseTables, validateRequest } from "../../utils/util";
 import requestConstraints from "../../constraints/task/delete.constraint.json";
+import { wrapAsJsonRequest } from "../../utils/lambda-handler";
 
-export const deleteTask: APIGatewayProxyHandler = async (
-  event: APIGatewayEvent,
-  _context: Context
-): Promise<APIGatewayProxyResult> => {
-  const requestData = JSON.parse(event.body || "{}");
+const deleteTaskHandler = async (body: {
+  taskId: string;
+  listId: string;
+}): Promise<ResponseModel> => {
   const databaseService = new DatabaseService();
-  const { taskId, listId } = requestData;
+  const { taskId, listId } = body;
   const { tasksTable } = databaseTables();
 
   try {
-    await validateAgainstConstraints(requestData, requestConstraints);
+    await validateRequest(body, requestConstraints);
     await databaseService.getItem({
       key: taskId,
       hash: "listId",
@@ -36,13 +30,12 @@ export const deleteTask: APIGatewayProxyHandler = async (
       },
     };
     await databaseService.delete(params);
-    const response = new ResponseModel({}, 200, "Task successfully deleted");
-    return response.generate();
+    return new ResponseModel({}, 200, "Task successfully deleted");
   } catch (error) {
-    const response =
-      error instanceof ResponseModel
-        ? error
-        : new ResponseModel({}, 500, "Task could not be deleted");
-    return response.generate();
+    return error instanceof ResponseModel
+      ? error
+      : new ResponseModel({}, 500, "Task could not be deleted");
   }
 };
+
+export const deleteTask = wrapAsJsonRequest(deleteTaskHandler);

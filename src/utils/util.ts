@@ -2,17 +2,18 @@ import validate from "validate.js/validate";
 
 import ResponseModel from "../models/response.model";
 
-type IGeneric<T> = {
-  [index in string | number | any]: T
-};
-
-export const validateAgainstConstraints = (values: IGeneric<string>, constraints: IGeneric<object>): Promise<void> => {
+export const validateRequest = <INPUT>(
+  values: INPUT,
+  constraints: { [key in string]: unknown }
+): Promise<void> => {
   return new Promise<void>((resolve, reject) => {
     const validation = validate(values, constraints);
     if (typeof validation === "undefined") {
       resolve();
     } else {
-      reject(new ResponseModel({validation}, 400, 'required fields are missing'));
+      reject(
+        new ResponseModel({ validation }, 400, "required fields are missing")
+      );
     }
   });
 };
@@ -35,6 +36,6 @@ export const databaseTables = (): DatabaseProp => {
   const { LIST_TABLE, TASKS_TABLE } = process.env;
   return {
     listTable: LIST_TABLE ?? "unknown-list-table",
-    tasksTable: TASKS_TABLE ?? "unknown-tasks-table"
+    tasksTable: TASKS_TABLE ?? "unknown-tasks-table",
   };
 };

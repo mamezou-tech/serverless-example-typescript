@@ -1,28 +1,28 @@
-import {
-  APIGatewayProxyHandler,
-  APIGatewayEvent,
-  Context,
-  APIGatewayProxyResult,
-} from "aws-lambda";
 import "source-map-support/register";
 
 import ResponseModel from "../../models/response.model";
-import DatabaseService, { DeleteItem, QueryItem } from "../../services/database.service";
-import { validateAgainstConstraints, createChunks, databaseTables } from "../../utils/util";
+import DatabaseService, {
+  DeleteItem,
+  QueryItem,
+} from "../../services/database.service";
+import {
+  createChunks,
+  databaseTables,
+  validateRequest,
+} from "../../utils/util";
 import requestConstraints from "../../constraints/list/get.constraint.json";
+import { wrapAsJsonRequest } from "../../utils/lambda-handler";
 
-export const deleteList: APIGatewayProxyHandler = async (
-  event: APIGatewayEvent,
-  _context: Context
-): Promise<APIGatewayProxyResult> => {
-  const requestData = JSON.parse(event.body ?? "{}");
-  const { listId } = requestData;
+const deleteListHandler = async (body: {
+  listId: string;
+}): Promise<ResponseModel> => {
   const { listTable, tasksTable } = databaseTables();
   const databaseService = new DatabaseService();
 
   try {
-    await validateAgainstConstraints(requestData, requestConstraints);
+    await validateRequest(body, requestConstraints);
     // check item exists
+    const { listId } = body;
     await databaseService.getItem({ key: listId, tableName: listTable });
 
     const params: DeleteItem = {
@@ -65,17 +65,12 @@ export const deleteList: APIGatewayProxyHandler = async (
         });
       }
     }
-    const response = new ResponseModel(
-      {},
-      200,
-      "To-do list successfully deleted"
-    );
-    return response.generate();
+    return new ResponseModel({}, 200, "To-do list successfully deleted");
   } catch (error) {
-    const response =
-      error instanceof ResponseModel
-        ? error
-        : new ResponseModel({}, 500, "To-do list cannot be deleted");
-    return response.generate();
+    return error instanceof ResponseModel
+      ? error
+      : new ResponseModel({}, 500, "To-do list cannot be deleted");
   }
 };
+
+export const deleteList = wrapAsJsonRequest(deleteListHandler);

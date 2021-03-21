@@ -1,23 +1,22 @@
-import { Context } from "aws-lambda";
 import "source-map-support/register";
 
-import ListModel from "../../models/list.model";
+import ListModel, { IListInterface } from "../../models/list.model";
 import ResponseModel from "../../models/response.model";
 
 import DatabaseService, { PutItem } from "../../services/database.service";
-import { databaseTables, validateAgainstConstraints } from "../../utils/util";
+import { databaseTables, validateRequest } from "../../utils/util";
 
 import requestConstraints from "../../constraints/list/create.constraint.json";
-import { PostRequestHandler, wrapPost } from "../../utils/lambda-handler";
+import { wrapAsJsonRequest } from "../../utils/lambda-handler";
 
-const createList: PostRequestHandler = async (
-  body: string,
-  _context: Context
+const createListHandler = async (
+  body: IListInterface
 ): Promise<ResponseModel> => {
   try {
-    await validateAgainstConstraints(body as any, requestConstraints);
+    await validateRequest(body, requestConstraints);
     const databaseService = new DatabaseService();
-    const listModel = new ListModel(body as any);
+
+    const listModel = new ListModel(body);
     const data = listModel.toEntityMappings();
     const params: PutItem = {
       TableName: databaseTables().listTable,
@@ -41,5 +40,4 @@ const createList: PostRequestHandler = async (
   }
 };
 
-const wrappedCreateList = wrapPost(createList);
-export { wrappedCreateList as createList };
+export const createList = wrapAsJsonRequest(createListHandler);

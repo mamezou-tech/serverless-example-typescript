@@ -1,28 +1,22 @@
-import {
-  APIGatewayProxyHandler,
-  APIGatewayEvent,
-  Context,
-  APIGatewayProxyResult,
-} from "aws-lambda";
 import "source-map-support/register";
 
 import ResponseModel from "../../models/response.model";
 import DatabaseService, { UpdateItem } from "../../services/database.service";
-import { databaseTables, validateAgainstConstraints } from "../../utils/util";
+import { databaseTables, validateRequest } from "../../utils/util";
 import requestConstraints from "../../constraints/list/update.constraint.json";
+import { wrapAsJsonRequest } from "../../utils/lambda-handler";
 
-export const updateList: APIGatewayProxyHandler = async (
-  event: APIGatewayEvent,
-  _context: Context
-): Promise<APIGatewayProxyResult> => {
-  const requestData = JSON.parse(event.body ?? "{}");
+const updateListHandler = async (body: {
+  listId: string;
+  name: string;
+}): Promise<ResponseModel> => {
   const databaseService = new DatabaseService();
   const { listTable } = databaseTables();
-  const { listId, name } = requestData;
+  const { listId, name } = body;
 
   try {
     await Promise.all([
-      validateAgainstConstraints(requestData, requestConstraints),
+      validateRequest(body, requestConstraints),
       databaseService.getItem({ key: listId, tableName: listTable }),
     ]);
 
@@ -42,17 +36,16 @@ export const updateList: APIGatewayProxyHandler = async (
       ReturnValues: "UPDATED_NEW",
     };
     const results = await databaseService.update(params);
-    const response = new ResponseModel(
+    return new ResponseModel(
       { ...results.Attributes },
       200,
       "To-do list successfully updated"
     );
-    return response.generate();
   } catch (error) {
-    const response =
-      error instanceof ResponseModel
-        ? error
-        : new ResponseModel({}, 500, "To-do list cannot be updated");
-    return response.generate();
+    return error instanceof ResponseModel
+      ? error
+      : new ResponseModel({}, 500, "To-do list cannot be updated");
   }
 };
+
+export const updateList = wrapAsJsonRequest(updateListHandler);
