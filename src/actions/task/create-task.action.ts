@@ -7,6 +7,7 @@ import { databaseTables, validateRequest } from "../../utils/util";
 import requestConstraints from "../../constraints/task/create.constraint.json";
 import { wrapAsRequest } from "../../utils/lambda-handler";
 import { StatusCode } from "../../enums/status-code.enum";
+import { ResponseMessage } from "../../enums/response-message.enum";
 
 const createTaskHandler = async (
   body: ITaskInterface
@@ -40,12 +41,16 @@ const createTaskHandler = async (
     return new ResponseModel(
       { taskId: data.id },
       StatusCode.CREATED,
-      "Task successfully added"
+      ResponseMessage.CREATE_TASK_SUCCESS
     );
   } catch (error) {
     return error instanceof ResponseModel
       ? error
-      : new ResponseModel({}, StatusCode.ERROR, "Task could not be added");
+      : new ResponseModel(
+          {},
+          StatusCode.ERROR,
+          ResponseMessage.CREATE_TASK_FAIL
+        );
   }
 };
 

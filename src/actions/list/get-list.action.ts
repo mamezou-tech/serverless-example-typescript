@@ -5,6 +5,8 @@ import DatabaseService, { QueryItem } from "../../services/database.service";
 import { databaseTables, validateRequest } from "../../utils/util";
 import requestConstraints from "../../constraints/list/get.constraint.json";
 import { QueryParams, wrapAsRequest } from "../../utils/lambda-handler";
+import { StatusCode } from "../../enums/status-code.enum";
+import { ResponseMessage } from "../../enums/response-message.enum";
 
 const getListHandler = async (
   _body: never,
@@ -48,12 +50,12 @@ const getListHandler = async (
         tasks: tasks,
       },
       200,
-      "To-do list successfully retrieved"
+      ResponseMessage.GET_LIST_SUCCESS
     );
   } catch (error) {
     return error instanceof ResponseModel
       ? error
-      : new ResponseModel({}, StatusCode.ERROR, "To-do list not found");
+      : new ResponseModel({}, StatusCode.ERROR, ResponseMessage.GET_LIST_FAIL);
   }
 };
 

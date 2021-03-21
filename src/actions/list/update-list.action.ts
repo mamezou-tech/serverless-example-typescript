@@ -5,6 +5,8 @@ import DatabaseService, { UpdateItem } from "../../services/database.service";
 import { databaseTables, validateRequest } from "../../utils/util";
 import requestConstraints from "../../constraints/list/update.constraint.json";
 import { wrapAsRequest } from "../../utils/lambda-handler";
+import { StatusCode } from "../../enums/status-code.enum";
+import { ResponseMessage } from "../../enums/response-message.enum";
 
 const updateListHandler = async (body: {
   listId: string;
@@ -39,12 +41,16 @@ const updateListHandler = async (body: {
     return new ResponseModel(
       { ...results.Attributes },
       200,
-      "To-do list successfully updated"
+      ResponseMessage.UPDATE_LIST_SUCCESS
     );
   } catch (error) {
     return error instanceof ResponseModel
       ? error
-      : new ResponseModel({}, StatusCode.ERROR, "To-do list cannot be updated");
+      : new ResponseModel(
+          {},
+          StatusCode.ERROR,
+          ResponseMessage.UPDATE_LIST_FAIL
+        );
   }
 };
 

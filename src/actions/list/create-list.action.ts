@@ -9,6 +9,7 @@ import { databaseTables, validateRequest } from "../../utils/util";
 import requestConstraints from "../../constraints/list/create.constraint.json";
 import { wrapAsRequest } from "../../utils/lambda-handler";
 import { StatusCode } from "../../enums/status-code.enum";
+import { ResponseMessage } from "../../enums/response-message.enum";
 
 const createListHandler = async (
   body: IListInterface
@@ -32,12 +33,16 @@ const createListHandler = async (
     return new ResponseModel(
       { listId: data.id },
       StatusCode.CREATED,
-      "TO-do list successfully created"
+      ResponseMessage.CREATE_LIST_SUCCESS
     );
   } catch (error) {
     return error instanceof ResponseModel
       ? error
-      : new ResponseModel({}, StatusCode.ERROR, "To-do list cannot be created");
+      : new ResponseModel(
+          {},
+          StatusCode.ERROR,
+          ResponseMessage.CREATE_LIST_FAIL
+        );
   }
 };
 

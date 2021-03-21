@@ -5,6 +5,8 @@ import DatabaseService, { UpdateItem } from "../../services/database.service";
 import { databaseTables, validateRequest } from "../../utils/util";
 import requestConstraints from "../../constraints/task/update.constraint.json";
 import { wrapAsRequest } from "../../utils/lambda-handler";
+import { StatusCode } from "../../enums/status-code.enum";
+import { ResponseMessage } from "../../enums/response-message.enum";
 
 const updateTaskHandler = async (body: {
   listId: string;
@@ -55,15 +57,19 @@ const updateTaskHandler = async (body: {
       return new ResponseModel(
         { ...results.Attributes },
         200,
-        "Task successfully updated"
+        ResponseMessage.UPDATE_TASK_SUCCESS
       );
     } else {
-      return new ResponseModel({}, 400, "Invalid Request!");
+      return new ResponseModel({}, 400, ResponseMessage.INVALID_REQUEST);
     }
   } catch (error) {
     return error instanceof ResponseModel
       ? error
-      : new ResponseModel({}, StatusCode.ERROR, "Task could not be updated");
+      : new ResponseModel(
+          {},
+          StatusCode.ERROR,
+          ResponseMessage.UPDATE_TASK_FAIL
+        );
   }
 };
 

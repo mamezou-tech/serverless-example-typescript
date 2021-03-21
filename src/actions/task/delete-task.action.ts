@@ -6,6 +6,7 @@ import { databaseTables, validateRequest } from "../../utils/util";
 import requestConstraints from "../../constraints/task/delete.constraint.json";
 import { QueryParams, wrapAsRequest } from "../../utils/lambda-handler";
 import { StatusCode } from "../../enums/status-code.enum";
+import { ResponseMessage } from "../../enums/response-message.enum";
 
 const deleteTaskHandler = async (
   _body: never,
@@ -27,7 +28,7 @@ const deleteTaskHandler = async (
       return new ResponseModel(
         {},
         StatusCode.NO_CONTENT,
-        "task has already been deleted"
+        ResponseMessage.DELETE_TASK_NOTFOUND
       );
     }
     const params: DeleteItem = {
@@ -38,11 +39,19 @@ const deleteTaskHandler = async (
       },
     };
     await databaseService.delete(params);
-    return new ResponseModel({}, StatusCode.NO_CONTENT, "Task successfully deleted");
+    return new ResponseModel(
+      {},
+      StatusCode.NO_CONTENT,
+      ResponseMessage.DELETE_TASK_SUCCESS
+    );
   } catch (error) {
     return error instanceof ResponseModel
       ? error
-      : new ResponseModel({}, StatusCode.ERROR, "Task could not be deleted");
+      : new ResponseModel(
+          {},
+          StatusCode.ERROR,
+          ResponseMessage.DELETE_TASK_FAIL
+        );
   }
 };
 

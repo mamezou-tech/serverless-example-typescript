@@ -73,7 +73,7 @@ export default class DatabaseService {
     throw new ResponseModel(
       { id: key },
       StatusCode.NOT_FOUND,
-      ResponseMessage.INVALID_REQUEST
+      ResponseMessage.GET_ITEM_ERROR
     );
   };
 

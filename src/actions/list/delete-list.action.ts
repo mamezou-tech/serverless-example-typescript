@@ -13,6 +13,7 @@ import {
 import requestConstraints from "../../constraints/list/get.constraint.json";
 import { QueryParams, wrapAsRequest } from "../../utils/lambda-handler";
 import { StatusCode } from "../../enums/status-code.enum";
+import { ResponseMessage } from "../../enums/response-message.enum";
 
 const deleteListHandler = async (
   _body: never,
@@ -34,7 +35,7 @@ const deleteListHandler = async (
       return new ResponseModel(
         {},
         StatusCode.NO_CONTENT,
-        "item has already been deleted"
+        ResponseMessage.DELETE_LIST_NOTFOUND
       );
     }
 
@@ -81,12 +82,16 @@ const deleteListHandler = async (
     return new ResponseModel(
       {},
       StatusCode.NO_CONTENT,
-      "To-do list successfully deleted"
+      ResponseMessage.DELETE_LIST_SUCCESS
     );
   } catch (error) {
     return error instanceof ResponseModel
       ? error
-      : new ResponseModel({}, StatusCode.ERROR, "To-do list cannot be deleted");
+      : new ResponseModel(
+          {},
+          StatusCode.ERROR,
+          ResponseMessage.DELETE_LIST_FAIL
+        );
   }
 };
 
