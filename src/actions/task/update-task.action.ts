@@ -56,11 +56,15 @@ const updateTaskHandler = async (body: {
       const results = await databaseService.update(params);
       return new ResponseModel(
         { ...results.Attributes },
-        200,
+        StatusCode.OK,
         ResponseMessage.UPDATE_TASK_SUCCESS
       );
     } else {
-      return new ResponseModel({}, 400, ResponseMessage.INVALID_REQUEST);
+      return new ResponseModel(
+        {},
+        StatusCode.BAD_REQUEST,
+        ResponseMessage.INVALID_REQUEST
+      );
     }
   } catch (error) {
     return error instanceof ResponseModel

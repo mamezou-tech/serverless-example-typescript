@@ -13,24 +13,6 @@ client.test("status=200", function () {
 })
 %}
 
-<> 2021-03-07T152102.200.json
-<> 2021-03-07T151726.200.json
-<> 2021-03-07T151351.200.json
-<> 2021-03-07T151151.200.json
-<> 2021-03-07T103449.200.json
-<> 2021-03-07T103341.200.json
-<> 2021-03-07T103226.200.json
-<> 2021-03-07T103036.200.json
-<> 2021-03-07T102856.200.json
-<> 2021-03-07T102339.200.json
-<> 2021-03-07T102327.200.json
-<> 2021-03-07T102232.200.json
-<> 2021-03-07T102127.200.json
-<> 2021-03-07T101949.200.json
-<> 2021-03-07T101933.200.json
-<> 2021-03-07T101735.200.json
-
-
 ### test GET /list
 GET {{baseUrl}}/list?listId={{listId}}
 
@@ -39,25 +21,6 @@ client.test("status=200", function () {
   client.assert(response.status === 200, "status code error")
 })
 %}
-
-<> 2021-03-07T152103.200.json
-<> 2021-03-07T151351-1.200.json
-<> 2021-03-07T151151-1.200.json
-<> 2021-03-07T103450.200.json
-<> 2021-03-07T103341-1.200.json
-<> 2021-03-07T103226-1.200.json
-<> 2021-03-07T103037.400.json
-<> 2021-03-07T102856-1.200.json
-<> 2021-03-07T102551.200.json
-<> 2021-03-07T102535.200.json
-<> 2021-03-07T102452.200.json
-<> 2021-03-07T102339-1.200.json
-<> 2021-03-07T102252.200.json
-<> 2021-03-07T101759.400.json
-<> 2021-03-07T101735.400.json
-<> 2021-03-07T101122.400.json
-<> 2021-03-07T101047.400.json
-
 
 ### test PUT /list
 PUT {{baseUrl}}/list
@@ -70,18 +33,6 @@ client.test("status=200", function() {
   client.assert(response.status === 200, "status code error")
 })
 %}
-
-<> 2021-03-07T152103-1.200.json
-<> 2021-03-07T151351-2.200.json
-<> 2021-03-07T151152.200.json
-<> 2021-03-07T103450-1.200.json
-<> 2021-03-07T103342.200.json
-<> 2021-03-07T103226-2.200.json
-<> 2021-03-07T103037-1.400.json
-<> 2021-03-07T102856-2.200.json
-
-
-<> 2021-03-07T103451.200.json
 
 ### test POST /task
 POST {{baseUrl}}/task
@@ -99,10 +50,6 @@ client.test("status=200", function () {
 })
  %}
 
-<> 2021-03-07T152103-2.200.json
-<> 2021-03-07T151352.200.json
-<> 2021-03-07T151152-1.200.json
-
 ### test GET /task
 GET {{baseUrl}}/task?listId={{listId}}&taskId={{taskId}}
 
@@ -111,10 +58,6 @@ client.test("status=200", function () {
   client.assert(response.status === 200, "status code error")
 })
  %}
-
-<> 2021-03-07T152103-3.200.json
-<> 2021-03-07T151352-1.200.json
-<> 2021-03-07T151152-2.200.json
 
 ### test PUT /task
 PUT {{baseUrl}}/task
@@ -132,10 +75,6 @@ client.test("status=200", function () {
 })
  %}
 
-<> 2021-03-07T152104.200.json
-<> 2021-03-07T151353.200.json
-<> 2021-03-07T151153.200.json
-
 ### test DELETE /task
 DELETE {{baseUrl}}/task?listId={{listId}}&taskId={{taskId}}
 
@@ -150,11 +89,6 @@ client.test("status=200", function () {
 })
  %}
 
-<> 2021-03-07T152104-1.200.json
-<> 2021-03-07T151353-1.200.json
-<> 2021-03-07T151153.400.json
-
-
 ### test DELETE /list
 DELETE {{baseUrl}}/list?listId={{listId}}
 
@@ -164,6 +98,3 @@ client.test("status=200", function () {
 })
 %}
 
-<> 2021-03-07T152104-2.200.json
-<> 2021-03-07T151353-2.200.json
-<> 2021-03-07T151153.500.json

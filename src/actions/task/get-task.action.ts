@@ -26,7 +26,7 @@ const getTaskHandler = async (
     });
     return new ResponseModel(
       { ...data.Item },
-      200,
+      StatusCode.OK,
       ResponseMessage.GET_TASK_SUCCESS
     );
   } catch (error) {

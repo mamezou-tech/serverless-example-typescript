@@ -40,7 +40,7 @@ const updateListHandler = async (body: {
     const results = await databaseService.update(params);
     return new ResponseModel(
       { ...results.Attributes },
-      200,
+      StatusCode.OK,
       ResponseMessage.UPDATE_LIST_SUCCESS
     );
   } catch (error) {

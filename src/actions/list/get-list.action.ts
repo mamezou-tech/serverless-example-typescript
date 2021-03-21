@@ -49,7 +49,7 @@ const getListHandler = async (
         taskCount: tasks?.length,
         tasks: tasks,
       },
-      200,
+      StatusCode.OK,
       ResponseMessage.GET_LIST_SUCCESS
     );
   } catch (error) {
