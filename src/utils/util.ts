@@ -5,11 +5,11 @@ import ResponseModel from "../models/response.model";
 export const validateRequest = <INPUT>(
   values: INPUT,
   constraints: { [key in string]: unknown }
-): Promise<void> => {
-  return new Promise<void>((resolve, reject) => {
+): Promise<INPUT> => {
+  return new Promise<INPUT>((resolve, reject) => {
     const validation = validate(values, constraints);
     if (typeof validation === "undefined") {
-      resolve();
+      resolve(values);
     } else {
       reject(
         new ResponseModel({ validation }, 400, "required fields are missing")

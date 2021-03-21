@@ -1,5 +1,5 @@
-### test /list/create
-POST {{baseUrl}}/list/create
+### test POST /list
+POST {{baseUrl}}/list
 Content-Type: application/json
 
 {
@@ -31,13 +31,8 @@ client.test("status=200", function () {
 <> 2021-03-07T101735.200.json
 
 
-### test /list
-POST {{baseUrl}}/list
-Content-Type: application/json
-
-{
-  "listId": "{{listId}}"
-}
+### test GET /list
+GET {{baseUrl}}/list?listId={{listId}}
 
 > {%
 client.test("status=200", function () {
@@ -64,8 +59,8 @@ client.test("status=200", function () {
 <> 2021-03-07T101047.400.json
 
 
-### test /list/update
-POST {{baseUrl}}/list/update
+### test PUT /list
+PUT {{baseUrl}}/list
 Content-Type: application/json
 
 {"name":"test-update","listId":"{{listId}}"}
@@ -88,8 +83,8 @@ client.test("status=200", function() {
 
 <> 2021-03-07T103451.200.json
 
-### test /task/create
-POST {{baseUrl}}/task/create
+### test POST /task
+POST {{baseUrl}}/task
 
 {
   "listId":"{{listId}}",
@@ -108,13 +103,8 @@ client.test("status=200", function () {
 <> 2021-03-07T151352.200.json
 <> 2021-03-07T151152-1.200.json
 
-### test /task
-POST {{baseUrl}}/task
-
-{
-  "listId":"{{listId}}",
-  "taskId":"{{taskId}}"
-}
+### test GET /task
+GET {{baseUrl}}/task?listId={{listId}}&taskId={{taskId}}
 
 > {%
 client.test("status=200", function () {
@@ -126,8 +116,8 @@ client.test("status=200", function () {
 <> 2021-03-07T151352-1.200.json
 <> 2021-03-07T151152-2.200.json
 
-### test /task/update
-POST {{baseUrl}}/task/update
+### test PUT /task
+PUT {{baseUrl}}/task
 
 {
   "listId":"{{listId}}",
@@ -146,8 +136,8 @@ client.test("status=200", function () {
 <> 2021-03-07T151353.200.json
 <> 2021-03-07T151153.200.json
 
-### test /task/delete
-POST {{baseUrl}}/task/delete
+### test DELETE /task
+DELETE {{baseUrl}}/task?listId={{listId}}&taskId={{taskId}}
 
 {
   "listId":"{{listId}}",
@@ -165,13 +155,8 @@ client.test("status=200", function () {
 <> 2021-03-07T151153.400.json
 
 
-### test /list/delete
-POST {{baseUrl}}/list/delete
-Content-Type: application/json
-
-{
-  "listId":"{{listId}}"
-}
+### test DELETE /list
+DELETE {{baseUrl}}/list?listId={{listId}}
 
 > {%
 client.test("status=200", function () {

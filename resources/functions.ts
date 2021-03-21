@@ -13,7 +13,7 @@ export default {
       {
         http: {
           method: "POST",
-          path: "list/create",
+          path: "list",
           cors: true,
           throttling: {
             maxRequestsPerSecond: 2,
@@ -28,8 +28,8 @@ export default {
     events: [
       {
         http: {
-          method: "POST",
-          path: "list/delete",
+          method: "DELETE",
+          path: "list",
           cors: true,
         },
       },
@@ -40,7 +40,7 @@ export default {
     events: [
       {
         http: {
-          method: "POST",
+          method: "GET",
           path: "list",
           cors: true,
         },
@@ -52,8 +52,8 @@ export default {
     events: [
       {
         http: {
-          method: "POST",
-          path: "list/update",
+          method: "PUT",
+          path: "list",
           cors: true,
         },
       },
@@ -65,7 +65,7 @@ export default {
       {
         http: {
           method: "POST",
-          path: "task/create",
+          path: "task",
           cors: true,
         },
       },
@@ -76,8 +76,8 @@ export default {
     events: [
       {
         http: {
-          method: "POST",
-          path: "task/delete",
+          method: "DELETE",
+          path: "task",
           cors: true,
         },
       },
@@ -88,7 +88,7 @@ export default {
     events: [
       {
         http: {
-          method: "POST",
+          method: "GET",
           path: "task",
           cors: true,
         },
@@ -100,8 +100,8 @@ export default {
     events: [
       {
         http: {
-          method: "POST",
-          path: "task/update",
+          method: "PUT",
+          path: "task",
           cors: true,
         },
       },

@@ -5,7 +5,7 @@ import ResponseModel from "../../models/response.model";
 import DatabaseService, { PutItem } from "../../services/database.service";
 import { databaseTables, validateRequest } from "../../utils/util";
 import requestConstraints from "../../constraints/task/create.constraint.json";
-import { wrapAsJsonRequest } from "../../utils/lambda-handler";
+import { wrapAsRequest } from "../../utils/lambda-handler";
 
 const createTaskHandler = async (
   body: ITaskInterface
@@ -48,4 +48,4 @@ const createTaskHandler = async (
   }
 };
 
-export const createTask = wrapAsJsonRequest(createTaskHandler);
+export const createTask = wrapAsRequest(createTaskHandler);

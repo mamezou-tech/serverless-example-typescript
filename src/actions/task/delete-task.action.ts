@@ -4,22 +4,22 @@ import ResponseModel from "../../models/response.model";
 import DatabaseService, { DeleteItem } from "../../services/database.service";
 import { databaseTables, validateRequest } from "../../utils/util";
 import requestConstraints from "../../constraints/task/delete.constraint.json";
-import { wrapAsJsonRequest } from "../../utils/lambda-handler";
+import { QueryParams, wrapAsRequest } from "../../utils/lambda-handler";
 
-const deleteTaskHandler = async (body: {
-  taskId: string;
-  listId: string;
-}): Promise<ResponseModel> => {
+const deleteTaskHandler = async (
+  _body: never,
+  queryParams: QueryParams
+): Promise<ResponseModel> => {
   const databaseService = new DatabaseService();
-  const { taskId, listId } = body;
   const { tasksTable } = databaseTables();
 
   try {
-    await validateRequest(body, requestConstraints);
+    await validateRequest(queryParams, requestConstraints);
+    const { taskId, listId } = queryParams;
     await databaseService.getItem({
-      key: taskId,
+      key: taskId!,
       hash: "listId",
-      hashValue: listId,
+      hashValue: listId!,
       tableName: tasksTable,
     });
     const params: DeleteItem = {
@@ -38,4 +38,4 @@ const deleteTaskHandler = async (body: {
   }
 };
 
-export const deleteTask = wrapAsJsonRequest(deleteTaskHandler);
+export const deleteTask = wrapAsRequest(deleteTaskHandler);

@@ -7,7 +7,7 @@ import DatabaseService, { PutItem } from "../../services/database.service";
 import { databaseTables, validateRequest } from "../../utils/util";
 
 import requestConstraints from "../../constraints/list/create.constraint.json";
-import { wrapAsJsonRequest } from "../../utils/lambda-handler";
+import { wrapAsRequest } from "../../utils/lambda-handler";
 
 const createListHandler = async (
   body: IListInterface
@@ -40,4 +40,4 @@ const createListHandler = async (
   }
 };
 
-export const createList = wrapAsJsonRequest(createListHandler);
+export const createList = wrapAsRequest(createListHandler);

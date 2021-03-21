@@ -4,7 +4,7 @@ import ResponseModel from "../../models/response.model";
 import DatabaseService, { UpdateItem } from "../../services/database.service";
 import { databaseTables, validateRequest } from "../../utils/util";
 import requestConstraints from "../../constraints/list/update.constraint.json";
-import { wrapAsJsonRequest } from "../../utils/lambda-handler";
+import { wrapAsRequest } from "../../utils/lambda-handler";
 
 const updateListHandler = async (body: {
   listId: string;
@@ -48,4 +48,4 @@ const updateListHandler = async (body: {
   }
 };
 
-export const updateList = wrapAsJsonRequest(updateListHandler);
+export const updateList = wrapAsRequest(updateListHandler);

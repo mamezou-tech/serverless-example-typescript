@@ -4,19 +4,20 @@ import ResponseModel from "../../models/response.model";
 import DatabaseService, { QueryItem } from "../../services/database.service";
 import { databaseTables, validateRequest } from "../../utils/util";
 import requestConstraints from "../../constraints/list/get.constraint.json";
-import { wrapAsJsonRequest } from "../../utils/lambda-handler";
+import { QueryParams, wrapAsRequest } from "../../utils/lambda-handler";
 
-const getListHandler = async (body: {
-  listId: string;
-}): Promise<ResponseModel> => {
+const getListHandler = async (
+  _body: never,
+  queryParams: QueryParams
+): Promise<ResponseModel> => {
   const databaseService = new DatabaseService();
   const { listTable, tasksTable } = databaseTables();
 
   try {
-    await validateRequest(body, requestConstraints);
-    const { listId } = body;
+    await validateRequest(queryParams, requestConstraints);
+    const { listId } = queryParams;
     const data = await databaseService.getItem({
-      key: listId,
+      key: listId!,
       tableName: listTable,
     });
 
@@ -56,4 +57,4 @@ const getListHandler = async (body: {
   }
 };
 
-export const getList = wrapAsJsonRequest(getListHandler);
+export const getList = wrapAsRequest(getListHandler);

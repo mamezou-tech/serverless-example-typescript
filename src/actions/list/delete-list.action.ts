@@ -11,19 +11,20 @@ import {
   validateRequest,
 } from "../../utils/util";
 import requestConstraints from "../../constraints/list/get.constraint.json";
-import { wrapAsJsonRequest } from "../../utils/lambda-handler";
+import { QueryParams, wrapAsRequest } from "../../utils/lambda-handler";
 
-const deleteListHandler = async (body: {
-  listId: string;
-}): Promise<ResponseModel> => {
+const deleteListHandler = async (
+  _body: never,
+  queryParams: QueryParams
+): Promise<ResponseModel> => {
   const { listTable, tasksTable } = databaseTables();
   const databaseService = new DatabaseService();
 
   try {
-    await validateRequest(body, requestConstraints);
+    await validateRequest(queryParams, requestConstraints);
     // check item exists
-    const { listId } = body;
-    await databaseService.getItem({ key: listId, tableName: listTable });
+    const { listId } = queryParams;
+    await databaseService.getItem({ key: listId!, tableName: listTable });
 
     const params: DeleteItem = {
       TableName: listTable,
@@ -73,4 +74,4 @@ const deleteListHandler = async (body: {
   }
 };
 
-export const deleteList = wrapAsJsonRequest(deleteListHandler);
+export const deleteList = wrapAsRequest(deleteListHandler);

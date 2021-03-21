@@ -55,7 +55,7 @@ const serverlessConfiguration: Serverless = {
       stages: ["prod"],
       topics: {
         alarm: {
-          topic: "${self:service}-${opt:stage}-alerts-alarm",
+          topic: "${self:service}-${self:custom.stage}-alerts-alarm",
           notifications: [
             {
               protocol: "email",
@@ -82,6 +82,8 @@ const serverlessConfiguration: Serverless = {
   provider: {
     name: "aws",
     runtime: "nodejs12.x",
+    stage: "dev",
+    region: "ap-northeast-1",
     logs: {
       restApi: {
         accessLogging: true,
@@ -109,8 +111,6 @@ const serverlessConfiguration: Serverless = {
       shouldStartNameWithService: true,
       minimumCompressionSize: 1024,
     },
-    stage: "dev",
-    region: "ap-northeast-1",
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
       REGION: "${self:custom.region}",

@@ -38,10 +38,12 @@ const config: IConfig = {
 };
 
 if (STAGE === DYNAMODB_LOCAL_STAGE) {
-  console.log("dynamodb-local mode");
   config.accessKeyId = DYNAMODB_LOCAL_ACCESS_KEY_ID;
   config.secretAccessKey = DYNAMODB_LOCAL_SECRET_ACCESS_KEY;
   config.endpoint = DYNAMODB_LOCAL_ENDPOINT;
+  console.log("dynamodb-local mode", config);
+} else {
+  console.log("running dynamodb on aws on", STAGE);
 }
 AWS.config.update(config);
 

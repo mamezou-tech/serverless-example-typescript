@@ -7,8 +7,8 @@
     "deploy:prod": "sls deploy --stage prod",
     "package:prod": "sls package --stage prod",
     "undeploy:prod": "sls remove --stage prod",
-    "start:offline": "sls offline start",
-    "start:offline:debug": "SLS_DEBUG=1 sls offline start",
+    "start:offline": "sls offline start --stage dev",
+    "start:offline:debug": "SLS_DEBUG=1 sls offline start --stage dev",
     "dynamodb:install": "sls dynamodb install",
     "lint": "eslint --fix",
     "prettier": "prettier -w src"

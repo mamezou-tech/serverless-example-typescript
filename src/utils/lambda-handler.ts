@@ -7,20 +7,30 @@ export type LambdaHandler = (
   context: Context
 ) => Promise<APIGatewayProxyResult>;
 
-export type PostRequestHandler<REQ> = (
+export type RequestHandler<REQ> = (
   body: REQ,
+  params: QueryParams,
   context: Context
 ) => Promise<ResponseModel>;
 
-export const wrapAsJsonRequest = <REQ>(
-  handler: PostRequestHandler<REQ>
+export type QueryParams = Record<string, string | undefined>;
+
+export const wrapAsRequest = <REQ = unknown>(
+  handler: RequestHandler<REQ>
 ): LambdaHandler => {
   return async (
     event: APIGatewayEvent,
     context: Context
   ): Promise<APIGatewayProxyResult> => {
-    const requestData: REQ = JSON.parse(event.body ?? "{}");
-    const response = await handler(requestData, context);
+    const requestData: REQ = event.body ? JSON.parse(event.body) : undefined;
+    const params = Object.keys(event.queryStringParameters || {}).reduce(
+      (acc, cur) => {
+        acc[cur] = event.queryStringParameters?.[cur];
+        return acc;
+      },
+      {}
+    );
+    const response = await handler(requestData, params, context);
     return response.generate();
   };
 };
