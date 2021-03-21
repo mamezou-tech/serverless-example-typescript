@@ -27,7 +27,7 @@ const deleteTaskHandler = async (
       return new ResponseModel(
         {},
         StatusCode.NO_CONTENT,
-        "task has already deleted"
+        "task has already been deleted"
       );
     }
     const params: DeleteItem = {

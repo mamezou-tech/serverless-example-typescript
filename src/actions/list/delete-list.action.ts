@@ -34,7 +34,7 @@ const deleteListHandler = async (
       return new ResponseModel(
         {},
         StatusCode.NO_CONTENT,
-        "item has already deleted"
+        "item has already been deleted"
       );
     }
 
