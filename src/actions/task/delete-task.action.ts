@@ -38,7 +38,7 @@ const deleteTaskHandler = async (
       },
     };
     await databaseService.delete(params);
-    return new ResponseModel({}, StatusCode.OK, "Task successfully deleted");
+    return new ResponseModel({}, StatusCode.NO_CONTENT, "Task successfully deleted");
   } catch (error) {
     return error instanceof ResponseModel
       ? error

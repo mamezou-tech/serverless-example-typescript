@@ -16,7 +16,10 @@ interface IResponse {
 
 const STATUS_MESSAGES = {
   200: Status.SUCCESS,
+  201: Status.SUCCESS,
+  204: Status.SUCCESS,
   400: Status.BAD_REQUEST,
+  404: Status.BAD_REQUEST,
   500: Status.ERROR,
 };
 
