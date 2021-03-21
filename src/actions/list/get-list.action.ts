@@ -53,7 +53,7 @@ const getListHandler = async (
   } catch (error) {
     return error instanceof ResponseModel
       ? error
-      : new ResponseModel({}, 500, "To-do list not found");
+      : new ResponseModel({}, StatusCode.ERROR, "To-do list not found");
   }
 };
 

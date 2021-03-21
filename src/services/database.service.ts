@@ -24,7 +24,7 @@ export type GetItemOutput = AWS.DynamoDB.DocumentClient.GetItemOutput;
 export type DeleteItem = AWS.DynamoDB.DocumentClient.DeleteItemInput;
 export type DeleteItemOutput = AWS.DynamoDB.DocumentClient.DeleteItemOutput;
 
-type Item = { [index: string]: string };
+type Item = Record<string, string>;
 
 const {
   STAGE,
@@ -69,7 +69,7 @@ export default class DatabaseService {
     if (Object.keys(results).length) {
       return results;
     }
-    console.error("item does not exist");
+    console.log("item does not exist");
     throw new ResponseModel(
       { id: key },
       StatusCode.NOT_FOUND,
@@ -77,12 +77,30 @@ export default class DatabaseService {
     );
   };
 
+  existsItem = async ({
+    key,
+    hash,
+    hashValue,
+    tableName,
+  }: Item): Promise<boolean> => {
+    try {
+      await this.getItem({ key, hash, hashValue, tableName });
+      return true;
+    } catch (e) {
+      if (e instanceof ResponseModel) {
+        return e.code !== StatusCode.NOT_FOUND;
+      } else {
+        throw e;
+      }
+    }
+  };
+
   create = async (params: PutItem): Promise<PutItemOutput> => {
     try {
       return await documentClient.put(params).promise();
     } catch (error) {
       console.error("create-error", error);
-      throw new ResponseModel({}, 500, `create-error: ${error}`);
+      throw new ResponseModel({}, StatusCode.ERROR, `create-error: ${error}`);
     }
   };
 
@@ -90,7 +108,11 @@ export default class DatabaseService {
     try {
       return await documentClient.batchWrite(params).promise();
     } catch (error) {
-      throw new ResponseModel({}, 500, `batch-write-error: ${error}`);
+      throw new ResponseModel(
+        {},
+        StatusCode.ERROR,
+        `batch-write-error: ${error}`
+      );
     }
   };
 
@@ -98,7 +120,7 @@ export default class DatabaseService {
     try {
       return await documentClient.update(params).promise();
     } catch (error) {
-      throw new ResponseModel({}, 500, `update-error: ${error}`);
+      throw new ResponseModel({}, StatusCode.ERROR, `update-error: ${error}`);
     }
   };
 
@@ -106,7 +128,7 @@ export default class DatabaseService {
     try {
       return await documentClient.query(params).promise();
     } catch (error) {
-      throw new ResponseModel({}, 500, `query-error: ${error}`);
+      throw new ResponseModel({}, StatusCode.ERROR, `query-error: ${error}`);
     }
   };
 
@@ -114,7 +136,7 @@ export default class DatabaseService {
     try {
       return await documentClient.get(params).promise();
     } catch (error) {
-      throw new ResponseModel({}, 500, `get-error: ${error}`);
+      throw new ResponseModel({}, StatusCode.ERROR, `get-error: ${error}`);
     }
   };
 
@@ -122,7 +144,7 @@ export default class DatabaseService {
     try {
       return await documentClient.delete(params).promise();
     } catch (error) {
-      throw new ResponseModel({}, 500, `delete-error: ${error}`);
+      throw new ResponseModel({}, StatusCode.ERROR, `delete-error: ${error}`);
     }
   };
 }

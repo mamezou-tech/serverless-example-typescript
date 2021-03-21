@@ -44,7 +44,7 @@ const updateListHandler = async (body: {
   } catch (error) {
     return error instanceof ResponseModel
       ? error
-      : new ResponseModel({}, 500, "To-do list cannot be updated");
+      : new ResponseModel({}, StatusCode.ERROR, "To-do list cannot be updated");
   }
 };
 

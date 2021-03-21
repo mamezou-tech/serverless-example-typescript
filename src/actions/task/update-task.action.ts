@@ -63,7 +63,7 @@ const updateTaskHandler = async (body: {
   } catch (error) {
     return error instanceof ResponseModel
       ? error
-      : new ResponseModel({}, 500, "Task could not be updated");
+      : new ResponseModel({}, StatusCode.ERROR, "Task could not be updated");
   }
 };
 

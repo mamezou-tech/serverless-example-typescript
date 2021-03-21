@@ -12,6 +12,7 @@ import {
 } from "../../utils/util";
 import requestConstraints from "../../constraints/list/get.constraint.json";
 import { QueryParams, wrapAsRequest } from "../../utils/lambda-handler";
+import { StatusCode } from "../../enums/status-code.enum";
 
 const deleteListHandler = async (
   _body: never,
@@ -22,9 +23,20 @@ const deleteListHandler = async (
 
   try {
     await validateRequest(queryParams, requestConstraints);
-    // check item exists
     const { listId } = queryParams;
-    await databaseService.getItem({ key: listId!, tableName: listTable });
+
+    // check item exists
+    const existsItem = await databaseService.existsItem({
+      key: listId!,
+      tableName: listTable,
+    });
+    if (!existsItem) {
+      return new ResponseModel(
+        {},
+        StatusCode.NO_CONTENT,
+        "item has already deleted"
+      );
+    }
 
     const params: DeleteItem = {
       TableName: listTable,
@@ -66,11 +78,15 @@ const deleteListHandler = async (
         });
       }
     }
-    return new ResponseModel({}, 200, "To-do list successfully deleted");
+    return new ResponseModel(
+      {},
+      StatusCode.NO_CONTENT,
+      "To-do list successfully deleted"
+    );
   } catch (error) {
     return error instanceof ResponseModel
       ? error
-      : new ResponseModel({}, 500, "To-do list cannot be deleted");
+      : new ResponseModel({}, StatusCode.ERROR, "To-do list cannot be deleted");
   }
 };
 

@@ -30,7 +30,7 @@ const getTaskHandler = async (
   } catch (error) {
     return error instanceof ResponseModel
       ? error
-      : new ResponseModel({}, 500, "Task not found");
+      : new ResponseModel({}, StatusCode.ERROR, "Task not found");
   }
 };
 
