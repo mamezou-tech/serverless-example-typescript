@@ -1,5 +1,3 @@
-import { CloudFormationResource } from "serverless/plugins/aws/provider/awsProvider";
-
 export default {
   ListTable: {
     Type: "AWS::DynamoDB::Table",
@@ -13,7 +11,7 @@ export default {
         WriteCapacityUnits: "${self:custom.tableThroughput}",
       },
     },
-  } as CloudFormationResource,
+  },
   TasksTable: {
     Type: "AWS::DynamoDB::Table",
     DeletionPolicy: "Delete",
@@ -46,5 +44,5 @@ export default {
         },
       ],
     },
-  } as CloudFormationResource,
+  },
 };

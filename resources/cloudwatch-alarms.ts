@@ -1,5 +1,3 @@
-import { CloudFormationResource } from "serverless/plugins/aws/provider/awsProvider";
-
 export default {
   // AlertTopic: {
   //   Type: "AWS::SNS::Topic",
@@ -15,6 +13,7 @@ export default {
   //   },
   // } as CloudFormationResource,
   ThrottlingFilter: {
+    DependsOn: ["ApiGatewayLogGroup"],
     Type: "AWS::Logs::MetricFilter",
     DeletionPolicy: "Delete",
     Properties: {
@@ -29,7 +28,7 @@ export default {
         },
       ],
     },
-  } as CloudFormationResource,
+  },
   ThrottlingAlarm: {
     Type: "AWS::CloudWatch::Alarm",
     DeletionPolicy: "Delete",
@@ -47,5 +46,5 @@ export default {
       Period: 60,
       Statistic: "Sum",
     },
-  } as CloudFormationResource,
+  } ,
 };

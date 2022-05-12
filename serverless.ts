@@ -1,77 +1,15 @@
-import type { Serverless } from "serverless/aws";
+import type { AWS } from "@serverless/typescript";
 import dynamoDbTables from "./resources/dynamodb-tables";
 import cloudwatchAlarms from "./resources/cloudwatch-alarms";
 import functions from "./resources/functions";
 
-const serverlessConfiguration: Serverless = {
+const serverlessConfiguration: AWS = {
   service: "todo-list",
-  frameworkVersion: "2",
-  custom: {
-    region: "${opt:region, self:provider.region}",
-    stage: "${opt:stage, self:provider.stage}",
-    prod: {
-      GW_ID: {
-        Ref: "ApiGatewayRestApi",
-      },
-    },
-    dev: {
-      GW_ID: "http://localhost:3000/",
-    },
-    notificationMailAddress: "${opt:mail, 'noboru-kudo@mamezou.com'}",
-    listTable: "${self:service}-list-table-${opt:stage, self:provider.stage}",
-    tasksTable: "${self:service}-tasks-table-${opt:stage, self:provider.stage}",
-    tableThroughputs: {
-      prod: 5,
-      default: 1,
-    },
-    tableThroughput:
-      "${self:custom.tableThroughputs.${self:custom.stage}, self:custom.tableThroughputs.default}",
-    dynamodb: {
-      stages: ["dev"],
-      start: {
-        port: 8008,
-        inMemory: true,
-        heapInitial: "200m",
-        heapMax: "1g",
-        migrate: true,
-        seed: true,
-        convertEmptyValues: true,
-      },
-    },
-    "serverless-offline": {
-      httpPort: 3000,
-      babelOptions: {
-        presets: ["env"],
-      },
-    },
-    // bundle: {
-    //   disableForkTsChecker: true,
-    // },
-    apiGatewayThrottling: {
-      maxRequestsPerSecond: 10,
-      maxConcurrentRequests: 5,
-    },
-    alerts: {
-      stages: ["prod"],
-      topics: {
-        alarm: {
-          topic: "${self:service}-${self:custom.stage}-alerts-alarm",
-          notifications: [
-            {
-              protocol: "email",
-              endpoint: "${self:custom.notificationMailAddress}",
-            },
-          ],
-        },
-      },
-      alarms: ["functionErrors", "functionThrottles"],
-    },
-  },
+  frameworkVersion: "3",
   plugins: [
-    "serverless-bundle",
+    "serverless-esbuild",
     "serverless-dynamodb-local",
     "serverless-offline",
-    "serverless-dotenv-plugin",
     "serverless-api-gateway-throttling",
     "serverless-plugin-subscription-filter",
     "serverless-plugin-aws-alerts",
@@ -81,7 +19,7 @@ const serverlessConfiguration: Serverless = {
   },
   provider: {
     name: "aws",
-    runtime: "nodejs12.x",
+    runtime: "nodejs14.x",
     stage: "dev",
     region: "ap-northeast-1",
     logs: {
@@ -118,30 +56,94 @@ const serverlessConfiguration: Serverless = {
       LIST_TABLE: "${self:custom.listTable}",
       TASKS_TABLE: "${self:custom.tasksTable}",
     },
-    iamRoleStatements: [
-      {
-        Effect: "Allow",
-        Action: [
-          "dynamodb:DescribeTable",
-          "dynamodb:Query",
-          "dynamodb:Scan",
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:UpdateItem",
-          "dynamodb:DeleteItem",
-        ],
-        Resource: [
-          { "Fn::GetAtt": ["ListTable", "Arn"] },
-          { "Fn::GetAtt": ["TasksTable", "Arn"] },
+    iam: {
+      role: {
+        statements: [
           {
-            "Fn::Join": [
-              "/",
-              [{ "Fn::GetAtt": ["TasksTable", "Arn"] }, "index", "list_index"],
+            Effect: "Allow",
+            Action: [
+              "dynamodb:DescribeTable",
+              "dynamodb:Query",
+              "dynamodb:Scan",
+              "dynamodb:GetItem",
+              "dynamodb:PutItem",
+              "dynamodb:UpdateItem",
+              "dynamodb:DeleteItem",
+            ],
+            Resource: [
+              { "Fn::GetAtt": ["ListTable", "Arn"] },
+              { "Fn::GetAtt": ["TasksTable", "Arn"] },
+              {
+                "Fn::Join": [
+                  "/",
+                  [{ "Fn::GetAtt": ["TasksTable", "Arn"] }, "index", "list_index"],
+                ],
+              },
             ],
           },
-        ],
+        ]
+      }
+    },
+  },
+  custom: {
+    region: "${opt:region, self:provider.region}",
+    stage: "${opt:stage, self:provider.stage}",
+    notificationMailAddress: "${opt:mail, 'noboru-kudo@mamezou.com'}",
+    listTable: "${self:service}-list-table-${opt:stage, self:provider.stage}",
+    tasksTable: "${self:service}-tasks-table-${opt:stage, self:provider.stage}",
+    tableThroughputs: {
+      prod: 5,
+      default: 1,
+    },
+    tableThroughput:
+      "${self:custom.tableThroughputs.${self:custom.stage}, self:custom.tableThroughputs.default}",
+    dynamodb: {
+      stages: ["dev"],
+      start: {
+        port: 8008,
+        inMemory: true,
+        heapInitial: "200m",
+        heapMax: "1g",
+        migrate: true,
+        seed: true,
+        convertEmptyValues: true,
       },
-    ],
+    },
+    esbuild: {
+      bundle: true,
+      minify: true,
+      sourcemap: true,
+      exclude: ['aws-sdk'],
+      target: 'node14',
+      define: { 'require.resolve': undefined },
+      platform: 'node',
+      concurrency: 10,
+    },
+    "serverless-offline": {
+      httpPort: 3000,
+      babelOptions: {
+        presets: ["env"],
+      },
+    },
+    apiGatewayThrottling: {
+      maxRequestsPerSecond: 10,
+      maxConcurrentRequests: 5,
+    },
+    alerts: {
+      stages: ["prod"],
+      topics: {
+        alarm: {
+          topic: "${self:service}-${self:custom.stage}-alerts-alarm",
+          notifications: [
+            {
+              protocol: "email",
+              endpoint: "${self:custom.notificationMailAddress}",
+            },
+          ],
+        },
+      },
+      alarms: ["functionErrors", "functionThrottles"],
+    },
   },
   functions,
   resources: {

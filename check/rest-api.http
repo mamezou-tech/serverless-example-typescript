@@ -7,8 +7,8 @@ Content-Type: application/json
 }
 
 > {%
-client.test("status=200", function () {
-  client.assert(response.status === 200, "status code error")
+client.test("status=201", function () {
+  client.assert(response.status === 201, "status code error")
   client.global.set("listId", response.body.data.listId)
 })
 %}
@@ -44,8 +44,8 @@ POST {{baseUrl}}/task
 }
 
 > {%
-client.test("status=200", function () {
-  client.assert(response.status === 200, "status code error")
+client.test("status=201", function () {
+  client.assert(response.status === 201, "status code error")
   client.global.set("taskId", response.body.data.taskId)
 })
  %}
@@ -84,8 +84,8 @@ DELETE {{baseUrl}}/task?listId={{listId}}&taskId={{taskId}}
 }
 
 > {%
-client.test("status=200", function () {
-  client.assert(response.status === 200, "status code error")
+client.test("status=204", function () {
+  client.assert(response.status === 204, "status code error")
 })
  %}
 
@@ -93,8 +93,8 @@ client.test("status=200", function () {
 DELETE {{baseUrl}}/list?listId={{listId}}
 
 > {%
-client.test("status=200", function () {
-  client.assert(response.status === 200, "status code error")
+client.test("status=204", function () {
+  client.assert(response.status === 204, "status code error")
 })
 %}
 

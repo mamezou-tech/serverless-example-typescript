@@ -26,21 +26,15 @@ export type DeleteItemOutput = AWS.DynamoDB.DocumentClient.DeleteItemOutput;
 
 type Item = Record<string, string>;
 
-const {
-  STAGE,
-  DYNAMODB_LOCAL_STAGE,
-  DYNAMODB_LOCAL_ACCESS_KEY_ID,
-  DYNAMODB_LOCAL_SECRET_ACCESS_KEY,
-  DYNAMODB_LOCAL_ENDPOINT,
-} = process.env;
+const { STAGE } = process.env;
 const config: IConfig = {
   region: "ap-northeast-1",
 };
 
-if (STAGE === DYNAMODB_LOCAL_STAGE) {
-  config.accessKeyId = DYNAMODB_LOCAL_ACCESS_KEY_ID;
-  config.secretAccessKey = DYNAMODB_LOCAL_SECRET_ACCESS_KEY;
-  config.endpoint = DYNAMODB_LOCAL_ENDPOINT;
+if (STAGE === "dev") {
+  config.accessKeyId = "dummy";
+  config.secretAccessKey = "dummy";
+  config.endpoint = "http://localhost:8008";
   console.log("dynamodb-local mode", config);
 } else {
   console.log("running dynamodb on aws on", STAGE);
@@ -51,11 +45,11 @@ const documentClient = new AWS.DynamoDB.DocumentClient();
 
 export default class DatabaseService {
   getItem = async ({
-    key,
-    hash,
-    hashValue,
-    tableName,
-  }: Item): Promise<GetItemOutput> => {
+                     key,
+                     hash,
+                     hashValue,
+                     tableName,
+                   }: Item): Promise<GetItemOutput> => {
     const params = {
       TableName: tableName,
       Key: {
@@ -71,20 +65,20 @@ export default class DatabaseService {
     }
     console.log("item does not exist");
     throw new ResponseModel(
-      { id: key },
+      {id: key},
       StatusCode.NOT_FOUND,
       ResponseMessage.GET_ITEM_ERROR
     );
   };
 
   existsItem = async ({
-    key,
-    hash,
-    hashValue,
-    tableName,
-  }: Item): Promise<boolean> => {
+                        key,
+                        hash,
+                        hashValue,
+                        tableName,
+                      }: Item): Promise<boolean> => {
     try {
-      await this.getItem({ key, hash, hashValue, tableName });
+      await this.getItem({key, hash, hashValue, tableName});
       return true;
     } catch (e) {
       if (e instanceof ResponseModel) {

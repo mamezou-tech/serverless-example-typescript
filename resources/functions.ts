@@ -1,11 +1,3 @@
-// import { AwsFunctionHandler } from "serverless/plugins/aws/provider/awsProvider";
-//
-// declare module "serverless" {
-//   export interface Event {
-//     subscriptionFilter: any;
-//   }
-// }
-
 export default {
   createList: {
     handler: "handler.createList",
