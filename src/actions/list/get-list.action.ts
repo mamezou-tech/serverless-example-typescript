@@ -1,12 +1,13 @@
 import "source-map-support/register";
 
-import ResponseModel from "../../models/response.model";
-import DatabaseService, { QueryItem } from "../../services/database.service";
-import { databaseTables, validateRequest } from "../../utils/util";
-import requestConstraints from "../../constraints/list/get.constraint.json";
-import { QueryParams, wrapAsRequest } from "../../utils/lambda-handler";
-import { StatusCode } from "../../enums/status-code.enum";
-import { ResponseMessage } from "../../enums/response-message.enum";
+import ResponseModel from "~/models/response.model";
+import DatabaseService from "~/services/database.service";
+import { databaseTables, validateRequest } from "~/utils/util";
+import requestConstraints from "~/constraints/list/get.constraint.json";
+import { QueryParams, wrapAsRequest } from "~/utils/lambda-handler";
+import { StatusCode } from "~/enums/status-code.enum";
+import { ResponseMessage } from "~/enums/response-message.enum";
+import { QueryCommandInput } from "@aws-sdk/lib-dynamodb";
 
 const getListHandler = async (
   _body: never,
@@ -23,7 +24,7 @@ const getListHandler = async (
       tableName: listTable,
     });
 
-    const params: QueryItem = {
+    const params: QueryCommandInput = {
       TableName: tasksTable,
       IndexName: "list_index",
       KeyConditionExpression: "listId = :listIdVal",

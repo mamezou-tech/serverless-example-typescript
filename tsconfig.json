@@ -1,24 +1,26 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "lib": ["es2017"],
     "removeComments": true,
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strictNullChecks": true,
     "sourceMap": true,
-    "target": "es2017",
+    "target": "es2022",
     "outDir": "lib",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
+    "paths": {
+      "~/*": ["src/*"]
+    }
   },
   "include": ["src"],
   "exclude": [
     "node_modules/**/*",
     ".serverless/**/*",
-    ".webpack/**/*",
     "_warmup/**/*",
-    ".vscode/**/*"
+    ".vscode/**/*",
+    ".dynamodb"
   ]
 }

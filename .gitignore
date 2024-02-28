@@ -13,3 +13,4 @@ jspm_packages
 .vscode
 .idea
 .dynamodb
+*.iml

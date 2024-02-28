@@ -1,12 +1,13 @@
 import "source-map-support/register";
 
-import ResponseModel from "../../models/response.model";
-import DatabaseService, { UpdateItem } from "../../services/database.service";
-import { databaseTables, validateRequest } from "../../utils/util";
-import requestConstraints from "../../constraints/list/update.constraint.json";
-import { wrapAsRequest } from "../../utils/lambda-handler";
-import { StatusCode } from "../../enums/status-code.enum";
-import { ResponseMessage } from "../../enums/response-message.enum";
+import ResponseModel from "~/models/response.model";
+import DatabaseService from "~/services/database.service";
+import { databaseTables, validateRequest } from "~/utils/util";
+import requestConstraints from "~/constraints/list/update.constraint.json";
+import { wrapAsRequest } from "~/utils/lambda-handler";
+import { StatusCode } from "~/enums/status-code.enum";
+import { ResponseMessage } from "~/enums/response-message.enum";
+import { UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
 
 const updateListHandler = async (body: {
   listId: string;
@@ -22,7 +23,7 @@ const updateListHandler = async (body: {
       databaseService.getItem({ key: listId, tableName: listTable }),
     ]);
 
-    const params: UpdateItem = {
+    const params: UpdateCommandInput = {
       TableName: listTable,
       Key: {
         id: listId,

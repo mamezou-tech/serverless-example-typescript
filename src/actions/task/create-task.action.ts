@@ -1,13 +1,14 @@
 import "source-map-support/register";
 
-import TaskModel, { ITaskInterface } from "../../models/task.model";
-import ResponseModel from "../../models/response.model";
-import DatabaseService, { PutItem } from "../../services/database.service";
-import { databaseTables, validateRequest } from "../../utils/util";
-import requestConstraints from "../../constraints/task/create.constraint.json";
-import { wrapAsRequest } from "../../utils/lambda-handler";
-import { StatusCode } from "../../enums/status-code.enum";
-import { ResponseMessage } from "../../enums/response-message.enum";
+import TaskModel, { ITaskInterface } from "~/models/task.model";
+import ResponseModel from "~/models/response.model";
+import DatabaseService from "~/services/database.service";
+import { databaseTables, validateRequest } from "~/utils/util";
+import requestConstraints from "~/constraints/task/create.constraint.json";
+import { wrapAsRequest } from "~/utils/lambda-handler";
+import { StatusCode } from "~/enums/status-code.enum";
+import { ResponseMessage } from "~/enums/response-message.enum";
+import { PutCommandInput } from '@aws-sdk/lib-dynamodb';
 
 const createTaskHandler = async (
   body: ITaskInterface
@@ -26,7 +27,7 @@ const createTaskHandler = async (
     const taskModel = new TaskModel(body);
     const data = taskModel.toEntityMapping();
 
-    const params: PutItem = {
+    const params: PutCommandInput = {
       TableName: tasksTable,
       Item: {
         id: data.id,

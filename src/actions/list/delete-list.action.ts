@@ -1,19 +1,13 @@
 import "source-map-support/register";
 
-import ResponseModel from "../../models/response.model";
-import DatabaseService, {
-  DeleteItem,
-  QueryItem,
-} from "../../services/database.service";
-import {
-  createChunks,
-  databaseTables,
-  validateRequest,
-} from "../../utils/util";
-import requestConstraints from "../../constraints/list/get.constraint.json";
-import { QueryParams, wrapAsRequest } from "../../utils/lambda-handler";
-import { StatusCode } from "../../enums/status-code.enum";
-import { ResponseMessage } from "../../enums/response-message.enum";
+import ResponseModel from "~/models/response.model";
+import { createChunks, databaseTables, validateRequest } from "~/utils/util";
+import requestConstraints from "~/constraints/list/get.constraint.json";
+import { QueryParams, wrapAsRequest } from "~/utils/lambda-handler";
+import { StatusCode } from "~/enums/status-code.enum";
+import { ResponseMessage } from "~/enums/response-message.enum";
+import DatabaseService from "~/services/database.service";
+import { DeleteCommandInput, QueryCommandInput } from "@aws-sdk/lib-dynamodb";
 
 const deleteListHandler = async (
   _body: never,
@@ -39,13 +33,13 @@ const deleteListHandler = async (
       );
     }
 
-    const params: DeleteItem = {
+    const params: DeleteCommandInput = {
       TableName: listTable,
       Key: { id: listId },
     };
     await databaseService.delete(params); // Delete to-do list
 
-    const taskParams: QueryItem = {
+    const taskParams: QueryCommandInput = {
       TableName: tasksTable,
       IndexName: "list_index",
       KeyConditionExpression: "listId = :listIdVal",

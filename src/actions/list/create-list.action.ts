@@ -1,15 +1,16 @@
 import "source-map-support/register";
 
-import ListModel, { IListInterface } from "../../models/list.model";
-import ResponseModel from "../../models/response.model";
+import ListModel, { IListInterface } from "~/models/list.model";
+import ResponseModel from "~/models/response.model";
 
-import DatabaseService, { PutItem } from "../../services/database.service";
-import { databaseTables, validateRequest } from "../../utils/util";
+import DatabaseService from "~/services/database.service";
+import { databaseTables, validateRequest } from "~/utils/util";
 
-import requestConstraints from "../../constraints/list/create.constraint.json";
-import { wrapAsRequest } from "../../utils/lambda-handler";
-import { StatusCode } from "../../enums/status-code.enum";
-import { ResponseMessage } from "../../enums/response-message.enum";
+import requestConstraints from "~/constraints/list/create.constraint.json";
+import { wrapAsRequest } from "~/utils/lambda-handler";
+import { StatusCode } from "~/enums/status-code.enum";
+import { ResponseMessage } from "~/enums/response-message.enum";
+import { PutCommandInput } from "@aws-sdk/lib-dynamodb";
 
 const createListHandler = async (
   body: IListInterface
@@ -20,7 +21,7 @@ const createListHandler = async (
 
     const listModel = new ListModel(body);
     const data = listModel.toEntityMappings();
-    const params: PutItem = {
+    const params: PutCommandInput = {
       TableName: databaseTables().listTable,
       Item: {
         id: data.id,

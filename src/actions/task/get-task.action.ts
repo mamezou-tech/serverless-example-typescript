@@ -1,12 +1,12 @@
 import "source-map-support/register";
 
-import ResponseModel from "../../models/response.model";
-import DatabaseService from "../../services/database.service";
-import { databaseTables, validateRequest } from "../../utils/util";
-import requestConstraints from "../../constraints/task/get.constraint.json";
-import { QueryParams, wrapAsRequest } from "../../utils/lambda-handler";
-import { ResponseMessage } from "../../enums/response-message.enum";
-import { StatusCode } from "../../enums/status-code.enum";
+import ResponseModel from "~/models/response.model";
+import DatabaseService from "~/services/database.service";
+import { databaseTables, validateRequest } from "~/utils/util";
+import requestConstraints from "~/constraints/task/get.constraint.json";
+import { QueryParams, wrapAsRequest } from "~/utils/lambda-handler";
+import { ResponseMessage } from "~/enums/response-message.enum";
+import { StatusCode } from "~/enums/status-code.enum";
 
 const getTaskHandler = async (
   _body: never,

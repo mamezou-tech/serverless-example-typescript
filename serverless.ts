@@ -8,10 +8,9 @@ const serverlessConfiguration: AWS = {
   frameworkVersion: "3",
   plugins: [
     "serverless-esbuild",
-    "serverless-dynamodb-local",
+    "serverless-dynamodb",
     "serverless-offline",
     "serverless-api-gateway-throttling",
-    "serverless-plugin-subscription-filter",
     "serverless-plugin-aws-alerts",
   ],
   package: {
@@ -19,7 +18,7 @@ const serverlessConfiguration: AWS = {
   },
   provider: {
     name: "aws",
-    runtime: "nodejs14.x",
+    runtime: "nodejs20.x",
     stage: "dev",
     region: "ap-northeast-1",
     logs: {
@@ -76,13 +75,17 @@ const serverlessConfiguration: AWS = {
               {
                 "Fn::Join": [
                   "/",
-                  [{ "Fn::GetAtt": ["TasksTable", "Arn"] }, "index", "list_index"],
+                  [
+                    { "Fn::GetAtt": ["TasksTable", "Arn"] },
+                    "index",
+                    "list_index",
+                  ],
                 ],
               },
             ],
           },
-        ]
-      }
+        ],
+      },
     },
   },
   custom: {
@@ -113,10 +116,10 @@ const serverlessConfiguration: AWS = {
       bundle: true,
       minify: true,
       sourcemap: true,
-      exclude: ['aws-sdk'],
-      target: 'node14',
-      define: { 'require.resolve': undefined },
-      platform: 'node',
+      exclude: ["aws-sdk"],
+      target: "node20",
+      define: { "require.resolve": undefined },
+      platform: "node",
       concurrency: 10,
     },
     "serverless-offline": {
@@ -130,7 +133,7 @@ const serverlessConfiguration: AWS = {
       maxConcurrentRequests: 5,
     },
     alerts: {
-      stages: ["prod"],
+      stages: ["dev", "prod"],
       topics: {
         alarm: {
           topic: "${self:service}-${self:custom.stage}-alerts-alarm",

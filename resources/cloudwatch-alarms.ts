@@ -46,5 +46,5 @@ export default {
       Period: 60,
       Statistic: "Sum",
     },
-  } ,
+  },
 };

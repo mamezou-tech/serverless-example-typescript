@@ -1,12 +1,13 @@
 import "source-map-support/register";
 
-import ResponseModel from "../../models/response.model";
-import DatabaseService, { DeleteItem } from "../../services/database.service";
-import { databaseTables, validateRequest } from "../../utils/util";
-import requestConstraints from "../../constraints/task/delete.constraint.json";
-import { QueryParams, wrapAsRequest } from "../../utils/lambda-handler";
-import { StatusCode } from "../../enums/status-code.enum";
-import { ResponseMessage } from "../../enums/response-message.enum";
+import ResponseModel from "~/models/response.model";
+import DatabaseService from "~/services/database.service";
+import { databaseTables, validateRequest } from "~/utils/util";
+import requestConstraints from "~/constraints/task/delete.constraint.json";
+import { QueryParams, wrapAsRequest } from "~/utils/lambda-handler";
+import { StatusCode } from "~/enums/status-code.enum";
+import { ResponseMessage } from "~/enums/response-message.enum";
+import { DeleteCommandInput } from '@aws-sdk/lib-dynamodb';
 
 const deleteTaskHandler = async (
   _body: never,
@@ -31,7 +32,7 @@ const deleteTaskHandler = async (
         ResponseMessage.DELETE_TASK_NOTFOUND
       );
     }
-    const params: DeleteItem = {
+    const params: DeleteCommandInput = {
       TableName: tasksTable,
       Key: {
         id: taskId,

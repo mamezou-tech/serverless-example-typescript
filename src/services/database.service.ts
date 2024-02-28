@@ -1,55 +1,59 @@
-import * as AWS from "aws-sdk";
-
 import ResponseModel from "../models/response.model";
 
 import { StatusCode } from "../enums/status-code.enum";
 import { ResponseMessage } from "../enums/response-message.enum";
-import IConfig from "../interfaces/config.interface";
 
-export type PutItem = AWS.DynamoDB.DocumentClient.PutItemInput;
-export type PutItemOutput = AWS.DynamoDB.DocumentClient.PutItemOutput;
-
-export type BatchWrite = AWS.DynamoDB.DocumentClient.BatchWriteItemInput;
-export type BatchWriteOutput = AWS.DynamoDB.DocumentClient.BatchWriteItemOutput;
-
-export type UpdateItem = AWS.DynamoDB.DocumentClient.UpdateItemInput;
-export type UpdateItemOutput = AWS.DynamoDB.DocumentClient.UpdateItemOutput;
-
-export type QueryItem = AWS.DynamoDB.DocumentClient.QueryInput;
-export type QueryItemOutput = AWS.DynamoDB.DocumentClient.QueryOutput;
-
-export type GetItem = AWS.DynamoDB.DocumentClient.GetItemInput;
-export type GetItemOutput = AWS.DynamoDB.DocumentClient.GetItemOutput;
-
-export type DeleteItem = AWS.DynamoDB.DocumentClient.DeleteItemInput;
-export type DeleteItemOutput = AWS.DynamoDB.DocumentClient.DeleteItemOutput;
+import { DynamoDBClient, DynamoDBClientConfig } from "@aws-sdk/client-dynamodb";
+import {
+  BatchWriteCommand,
+  BatchWriteCommandInput,
+  BatchWriteCommandOutput,
+  DeleteCommand,
+  DeleteCommandInput,
+  DeleteCommandOutput,
+  DynamoDBDocumentClient,
+  GetCommand,
+  GetCommandInput,
+  GetCommandOutput,
+  PutCommand,
+  PutCommandInput,
+  PutCommandOutput,
+  QueryCommand,
+  QueryCommandInput,
+  QueryCommandOutput,
+  UpdateCommand,
+  UpdateCommandInput,
+  UpdateCommandOutput,
+} from "@aws-sdk/lib-dynamodb";
 
 type Item = Record<string, string>;
 
 const { STAGE } = process.env;
-const config: IConfig = {
+const config: DynamoDBClientConfig = {
   region: "ap-northeast-1",
 };
 
 if (STAGE === "dev") {
-  config.accessKeyId = "dummy";
-  config.secretAccessKey = "dummy";
+  config.credentials = {
+    accessKeyId: "dummy",
+    secretAccessKey: "dummy",
+  };
   config.endpoint = "http://localhost:8008";
   console.log("dynamodb-local mode", config);
 } else {
-  console.log("running dynamodb on aws on", STAGE);
+  console.log("running dynamodb on aws", STAGE);
 }
-AWS.config.update(config);
 
-const documentClient = new AWS.DynamoDB.DocumentClient();
+const dynamodbClient = new DynamoDBClient(config);
+const documentClient = DynamoDBDocumentClient.from(dynamodbClient);
 
 export default class DatabaseService {
   getItem = async ({
-                     key,
-                     hash,
-                     hashValue,
-                     tableName,
-                   }: Item): Promise<GetItemOutput> => {
+    key,
+    hash,
+    hashValue,
+    tableName,
+  }: Item): Promise<GetCommandOutput> => {
     const params = {
       TableName: tableName,
       Key: {
@@ -65,20 +69,20 @@ export default class DatabaseService {
     }
     console.log("item does not exist");
     throw new ResponseModel(
-      {id: key},
+      { id: key },
       StatusCode.NOT_FOUND,
       ResponseMessage.GET_ITEM_ERROR
     );
   };
 
   existsItem = async ({
-                        key,
-                        hash,
-                        hashValue,
-                        tableName,
-                      }: Item): Promise<boolean> => {
+    key,
+    hash,
+    hashValue,
+    tableName,
+  }: Item): Promise<boolean> => {
     try {
-      await this.getItem({key, hash, hashValue, tableName});
+      await this.getItem({ key, hash, hashValue, tableName });
       return true;
     } catch (e) {
       if (e instanceof ResponseModel) {
@@ -89,18 +93,20 @@ export default class DatabaseService {
     }
   };
 
-  create = async (params: PutItem): Promise<PutItemOutput> => {
+  create = async (params: PutCommandInput): Promise<PutCommandOutput> => {
     try {
-      return await documentClient.put(params).promise();
+      return await documentClient.send(new PutCommand(params));
     } catch (error) {
       console.error("create-error", error);
       throw new ResponseModel({}, StatusCode.ERROR, `create-error: ${error}`);
     }
   };
 
-  batchCreate = async (params: BatchWrite): Promise<BatchWriteOutput> => {
+  batchCreate = async (
+    params: BatchWriteCommandInput
+  ): Promise<BatchWriteCommandOutput> => {
     try {
-      return await documentClient.batchWrite(params).promise();
+      return await documentClient.send(new BatchWriteCommand(params));
     } catch (error) {
       throw new ResponseModel(
         {},
@@ -110,33 +116,33 @@ export default class DatabaseService {
     }
   };
 
-  update = async (params: UpdateItem): Promise<UpdateItemOutput> => {
+  update = async (params: UpdateCommandInput): Promise<UpdateCommandOutput> => {
     try {
-      return await documentClient.update(params).promise();
+      return await documentClient.send(new UpdateCommand(params));
     } catch (error) {
       throw new ResponseModel({}, StatusCode.ERROR, `update-error: ${error}`);
     }
   };
 
-  query = async (params: QueryItem): Promise<QueryItemOutput> => {
+  query = async (params: QueryCommandInput): Promise<QueryCommandOutput> => {
     try {
-      return await documentClient.query(params).promise();
+      return await documentClient.send(new QueryCommand(params));
     } catch (error) {
       throw new ResponseModel({}, StatusCode.ERROR, `query-error: ${error}`);
     }
   };
 
-  get = async (params: GetItem): Promise<GetItemOutput> => {
+  get = async (params: GetCommandInput): Promise<GetCommandOutput> => {
     try {
-      return await documentClient.get(params).promise();
+      return await documentClient.send(new GetCommand(params));
     } catch (error) {
       throw new ResponseModel({}, StatusCode.ERROR, `get-error: ${error}`);
     }
   };
 
-  delete = async (params: DeleteItem): Promise<DeleteItemOutput> => {
+  delete = async (params: DeleteCommandInput): Promise<DeleteCommandOutput> => {
     try {
-      return await documentClient.delete(params).promise();
+      return await documentClient.send(new DeleteCommand(params));
     } catch (error) {
       throw new ResponseModel({}, StatusCode.ERROR, `delete-error: ${error}`);
     }

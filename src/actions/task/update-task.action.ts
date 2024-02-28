@@ -1,12 +1,13 @@
 import "source-map-support/register";
 
-import ResponseModel from "../../models/response.model";
-import DatabaseService, { UpdateItem } from "../../services/database.service";
-import { databaseTables, validateRequest } from "../../utils/util";
-import requestConstraints from "../../constraints/task/update.constraint.json";
-import { wrapAsRequest } from "../../utils/lambda-handler";
-import { StatusCode } from "../../enums/status-code.enum";
-import { ResponseMessage } from "../../enums/response-message.enum";
+import ResponseModel from "~/models/response.model";
+import DatabaseService from "~/services/database.service";
+import { databaseTables, validateRequest } from "~/utils/util";
+import requestConstraints from "~/constraints/task/update.constraint.json";
+import { wrapAsRequest } from "~/utils/lambda-handler";
+import { StatusCode } from "~/enums/status-code.enum";
+import { ResponseMessage } from "~/enums/response-message.enum";
+import { UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
 
 const updateTaskHandler = async (body: {
   listId: string;
@@ -32,7 +33,7 @@ const updateTaskHandler = async (body: {
     } updatedAt = :timestamp`;
 
     if (description || isCompletedPresent) {
-      const params: UpdateItem = {
+      const params: UpdateCommandInput = {
         TableName: tasksTable,
         Key: {
           id: taskId,
